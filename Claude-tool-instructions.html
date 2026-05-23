@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tool Usage Instructions — Nova's Stack</title>
+<link href="https://fonts.googleapis.com/css2?family=Fjalla+One&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060609;
+  --surface:#0c0c12;
+  --surface2:#12121a;
+  --border:rgba(255,255,255,.05);
+  --border2:rgba(255,255,255,.1);
+  --green:#00ff88;
+  --blue:#00c8ff;
+  --purple:#9d6fff;
+  --red:#ff4d6d;
+  --yellow:#ffd166;
+  --text:#eeeef5;
+  --muted:#555568;
+  --muted2:#9090a8;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Fjalla One',sans-serif;
+  overflow-x:hidden;
+}
+
+/* grid bg */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;z-index:0;
+}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 32px;position:relative;z-index:1}
+
+/* HEADER */
+header{
+  border-bottom:1px solid var(--border);
+  padding:0;
+  position:sticky;top:0;z-index:100;
+  background:rgba(6,6,9,.85);
+  backdrop-filter:blur(12px);
+}
+.header-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 32px;max-width:900px;margin:0 auto;
+}
+.logo{font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--green)}
+.nav{display:flex;gap:4px}
+.nav a{
+  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;
+  text-decoration:none;color:var(--muted2);padding:6px 10px;border-radius:4px;
+  transition:color .2s,background .2s;text-transform:uppercase;
+}
+.nav a:hover{color:var(--text);background:rgba(255,255,255,.04)}
+
+/* HERO */
+.hero{
+  padding:88px 0 72px;
+  border-bottom:1px solid var(--border);
+  position:relative;
+}
+.hero-tag{
+  font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;
+  text-transform:uppercase;color:var(--green);margin-bottom:20px;
+  opacity:0;animation:up .4s .1s forwards;
+}
+.hero h1{
+  font-size:clamp(36px,6vw,72px);font-weight:800;line-height:.95;
+  letter-spacing:-3px;margin-bottom:20px;
+  opacity:0;animation:up .4s .2s forwards;
+}
+.hero h1 span{color:var(--green)}
+.hero-sub{
+  font-size:15px;color:var(--muted2);max-width:500px;line-height:1.7;
+  font-weight:400;opacity:0;animation:up .4s .3s forwards;
+}
+.hero-badges{
+  display:flex;gap:8px;flex-wrap:wrap;margin-top:28px;
+  opacity:0;animation:up .4s .4s forwards;
+}
+.badge{
+  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;
+  padding:5px 12px;border-radius:100px;text-transform:uppercase;
+}
+.b-green{background:rgba(0,255,136,.08);color:var(--green);border:1px solid rgba(0,255,136,.2)}
+.b-blue{background:rgba(0,200,255,.08);color:var(--blue);border:1px solid rgba(0,200,255,.2)}
+.b-purple{background:rgba(157,111,255,.08);color:var(--purple);border:1px solid rgba(157,111,255,.2)}
+.b-red{background:rgba(255,77,109,.08);color:var(--red);border:1px solid rgba(255,77,109,.2)}
+.b-yellow{background:rgba(255,209,102,.08);color:var(--yellow);border:1px solid rgba(255,209,102,.2)}
+
+/* TOOL SECTIONS */
+.tool{
+  border-bottom:1px solid var(--border);
+  padding:72px 0;
+  position:relative;z-index:1;
+}
+.tool-header{
+  display:flex;align-items:flex-start;gap:20px;margin-bottom:40px;
+}
+.tool-icon{
+  width:52px;height:52px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.tool-meta{}
+.tool-num{
+  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;margin-bottom:6px;
+}
+.tool-name{font-size:28px;font-weight:800;letter-spacing:-1px;line-height:1}
+.tool-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);margin-top:6px}
+
+/* cards */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:20px 24px;margin-bottom:12px;
+}
+.card-label{
+  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;margin-bottom:10px;
+}
+.card-title{font-size:13px;font-weight:700;margin-bottom:6px}
+.card-text{font-size:12px;color:var(--muted2);line-height:1.7}
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.card-full{margin-bottom:12px}
+
+/* code */
+.code{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:6px;padding:16px 20px;
+  font-family:'Space Mono',monospace;font-size:11px;
+  line-height:1.9;overflow-x:auto;margin-top:10px;
+}
+.cm{color:var(--muted)}.ck{color:var(--blue)}.cv{color:var(--green)}.cs{color:var(--purple)}.cw{color:var(--red)}
+
+/* step flow */
+.steps{display:flex;flex-direction:column;gap:0;margin-bottom:20px}
+.step{
+  display:flex;gap:20px;padding:18px 0;
+  border-bottom:1px solid var(--border);
+}
+.step:last-child{border-bottom:none}
+.step-num{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
+  flex-shrink:0;margin-top:1px;
+}
+.step-content{}
+.step-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.step-text{font-size:12px;color:var(--muted2);line-height:1.7}
+.step-cmd{
+  display:inline-block;margin-top:8px;
+  font-family:'Space Mono',monospace;font-size:10px;
+  padding:5px 10px;border-radius:4px;
+  background:var(--surface2);border:1px solid var(--border2);
+}
+
+/* prompt box */
+.prompt{
+  border-radius:6px;padding:14px 18px;margin-bottom:10px;
+  border-left:3px solid;
+}
+.prompt-title{font-size:11px;font-weight:700;margin-bottom:4px}
+.prompt-text{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);line-height:1.6}
+
+/* combo box */
+.combo{
+  background:linear-gradient(135deg,rgba(0,255,136,.03),rgba(0,200,255,.03));
+  border:1px solid var(--border2);border-radius:8px;padding:28px;
+}
+.combo-title{font-size:16px;font-weight:800;letter-spacing:-.5px;margin-bottom:16px}
+.combo-row{
+  display:flex;gap:10px;margin-bottom:10px;font-size:12px;color:var(--muted2);line-height:1.6;
+}
+.combo-row:last-child{margin-bottom:0}
+.combo-tag{
+  font-family:'Space Mono',monospace;font-size:9px;padding:2px 7px;border-radius:3px;
+  white-space:nowrap;height:fit-content;margin-top:2px;flex-shrink:0;
+}
+
+/* swarm config */
+.swarm{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:6px;overflow:hidden;margin-bottom:12px;
+}
+.swarm-head{
+  padding:10px 16px;border-bottom:1px solid var(--border);
+  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;
+}
+.swarm-body{padding:14px 16px}
+
+/* divider */
+.div{height:1px;background:var(--border)}
+
+/* footer */
+footer{padding:48px 0;border-top:1px solid var(--border);position:relative;z-index:1}
+.footer-inner{display:flex;justify-content:space-between;align-items:center}
+.footer-l{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);line-height:1.8}
+.footer-r{font-family:'Space Mono',monospace;font-size:9px;color:var(--green)}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .4s,transform .4s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.card-grid{grid-template-columns:1fr}.hero h1{letter-spacing:-2px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">Nova's Stack</div>
+    <nav class="nav">
+      <a href="#karpathy">Karpathy</a>
+      <a href="#superpowers">Superpowers</a>
+      <a href="#opendesign">Design</a>
+      <a href="#ecc">ECC</a>
+      <a href="#ruflo">Ruflo</a>
+      <a href="#printing">Printing</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+<div class="wrap">
+  <div class="hero-tag">// usage instructions</div>
+  <h1>How to Use<br><span>Your Stack</span></h1>
+  <p class="hero-sub">Exact commands, prompts, and workflows for every tool. No theory — just what to run and when.</p>
+  <div class="hero-badges">
+    <span class="badge b-green">Karpathy</span>
+    <span class="badge b-blue">Superpowers</span>
+    <span class="badge b-purple">Open Design</span>
+    <span class="badge b-red">ECC</span>
+    <span class="badge b-blue">Ruflo</span>
+    <span class="badge b-green">Printing Press</span>
+  </div>
+</div>
+</section>
+
+<!-- ══════════ KARPATHY ══════════ -->
+<section class="tool" id="karpathy">
+<div class="wrap">
+  <div class="tool-header reveal">
+    <div class="tool-icon" style="background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2)">&#128215;</div>
+    <div class="tool-meta">
+      <div class="tool-num" style="color:var(--green)">01 — passive, always on</div>
+      <div class="tool-name">Karpathy Guidelines</div>
+      <div class="tool-sub">nothing to activate — works automatically every session</div>
+    </div>
+  </div>
+
+  <div class="card-grid reveal">
+    <div class="card" style="border-color:rgba(0,255,136,.12)">
+      <div class="card-label" style="color:var(--green)">4 Rules It Enforces</div>
+      <div style="font-size:12px;color:var(--muted2);line-height:2">
+        <div><span style="color:var(--green);font-weight:700">1.</span> Think before coding — plan first</div>
+        <div><span style="color:var(--green);font-weight:700">2.</span> Build simplest thing that works</div>
+        <div><span style="color:var(--green);font-weight:700">3.</span> Surgical changes only</div>
+        <div><span style="color:var(--green);font-weight:700">4.</span> Don't improve what wasn't asked</div>
+      </div>
+    </div>
+    <div class="card" style="border-color:rgba(255,77,109,.12)">
+      <div class="card-label" style="color:var(--red)">What It Prevents</div>
+      <div style="font-size:12px;color:var(--muted2);line-height:2">
+        <div><span style="color:var(--red)">x</span> Refactoring files you didn't mention</div>
+        <div><span style="color:var(--red)">x</span> Adding features nobody asked for</div>
+        <div><span style="color:var(--red)">x</span> Over-engineering simple fixes</div>
+        <div><span style="color:var(--red)">x</span> Infinite loops with no exit criteria</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-label reveal" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">// Prompts that work with it</div>
+
+  <div class="prompt reveal" style="border-color:var(--green);background:rgba(0,255,136,.03)">
+    <div class="prompt-title" style="color:var(--green)">Be specific about scope</div>
+    <div class="prompt-text">"Fix the login bug in auth.js — don't touch anything else"</div>
+  </div>
+  <div class="prompt reveal" style="border-color:var(--green);background:rgba(0,255,136,.03)">
+    <div class="prompt-title" style="color:var(--green)">Define done explicitly</div>
+    <div class="prompt-text">"Done = user can log in without 401 error. Stop after that."</div>
+  </div>
+  <div class="prompt reveal" style="border-color:var(--green);background:rgba(0,255,136,.03)">
+    <div class="prompt-title" style="color:var(--green)">Cybersecurity scripts</div>
+    <div class="prompt-text">"Write a bash script to detect failed SSH logins. Only create detection.sh — don't modify any existing files."</div>
+  </div>
+  <div class="prompt reveal" style="border-color:var(--red);background:rgba(255,77,109,.03)">
+    <div class="prompt-title" style="color:var(--red)">If it feels too restrictive</div>
+    <div class="prompt-text">"Refactor the entire auth module — this is intentional, not a bug fix."<br>It'll comply when you're explicit.</div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════ SUPERPOWERS ══════════ -->
+<section class="tool" id="superpowers">
+<div class="wrap">
+  <div class="tool-header reveal">
+    <div class="tool-icon" style="background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.2)">&#9889;</div>
+    <div class="tool-meta">
+      <div class="tool-num" style="color:var(--blue)">02 — 3 slash commands</div>
+      <div class="tool-name">Superpowers</div>
+      <div class="tool-sub">brainstorm → write-plan → execute-plan. never skip steps.</div>
+    </div>
+  </div>
+
+  <div class="steps reveal">
+    <div class="step">
+      <div class="step-num" style="background:rgba(0,200,255,.1);border:1px solid rgba(0,200,255,.25);color:var(--blue)">1</div>
+      <div class="step-content">
+        <div class="step-title">/superpowers:brainstorm</div>
+        <div class="step-text">Explores approaches, surfaces edge cases, asks clarifying questions. Use when you're not sure exactly what to build yet.</div>
+        <div class="step-cmd" style="color:var(--blue)">/superpowers:brainstorm build a CVE monitoring script that alerts on critical vulns</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:rgba(0,200,255,.1);border:1px solid rgba(0,200,255,.25);color:var(--blue)">2</div>
+      <div class="step-content">
+        <div class="step-title">/superpowers:write-plan</div>
+        <div class="step-text">Writes a full spec before touching any code. Defines files, functions, success criteria, edge cases. <strong style="color:var(--text)">Review this carefully — it's your last cheap checkpoint.</strong></div>
+        <div class="step-cmd" style="color:var(--blue)">/superpowers:write-plan</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.25);color:var(--green)">3</div>
+      <div class="step-content">
+        <div class="step-title">/superpowers:execute-plan</div>
+        <div class="step-text">Executes the approved spec. Dispatches parallel sub-agents for independent tasks. Runs tests. Self-reviews. Only run after you've approved the plan.</div>
+        <div class="step-cmd" style="color:var(--green)">/superpowers:execute-plan</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-label reveal" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">// Real examples</div>
+  <div class="card-grid reveal">
+    <div class="card">
+      <div class="card-title" style="color:var(--blue)">Detection script</div>
+      <div class="code" style="margin-top:8px">
+<span class="cv">/superpowers:brainstorm</span> SSH brute force detector
+<span class="cv">/superpowers:write-plan</span>
+<span class="cm">// review spec</span>
+<span class="cv">/superpowers:execute-plan</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--blue)">App feature</div>
+      <div class="code" style="margin-top:8px">
+<span class="cv">/superpowers:brainstorm</span> user auth system
+<span class="cv">/superpowers:write-plan</span>
+<span class="cm">// edit spec if needed</span>
+<span class="cv">/superpowers:execute-plan</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--blue)">Security audit</div>
+      <div class="code" style="margin-top:8px">
+<span class="cv">/superpowers:brainstorm</span> audit this codebase for vulns
+<span class="cv">/superpowers:write-plan</span>
+<span class="cm">// confirm scope</span>
+<span class="cv">/superpowers:execute-plan</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--blue)">SIEM detection rule</div>
+      <div class="code" style="margin-top:8px">
+<span class="cv">/superpowers:brainstorm</span> KQL rule for lateral movement
+<span class="cv">/superpowers:write-plan</span>
+<span class="cm">// review logic</span>
+<span class="cv">/superpowers:execute-plan</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════ OPEN DESIGN ══════════ -->
+<section class="tool" id="opendesign">
+<div class="wrap">
+  <div class="tool-header reveal">
+    <div class="tool-icon" style="background:rgba(157,111,255,.08);border:1px solid rgba(157,111,255,.2)">&#127912;</div>
+    <div class="tool-meta">
+      <div class="tool-num" style="color:var(--purple)">03 — reference by name in any prompt</div>
+      <div class="tool-name">Open Design</div>
+      <div class="tool-sub">no command needed — just say the design system name</div>
+    </div>
+  </div>
+
+  <p class="reveal" style="font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:28px">You don't activate Open Design. You reference a system by name in your prompt and <code style="background:var(--surface2);padding:2px 6px;border-radius:3px;font-size:10px;font-family:'Space Mono',monospace">ds</code> pulls from <code style="background:var(--surface2);padding:2px 6px;border-radius:3px;font-size:10px;font-family:'Space Mono',monospace">~/tools/open-design</code> automatically via your CLAUDE.md.</p>
+
+  <div class="card-label reveal" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">// Prompts that work</div>
+
+  <div class="prompt reveal" style="border-color:var(--purple);background:rgba(157,111,255,.03)">
+    <div class="prompt-title" style="color:var(--purple)">Polish existing UI</div>
+    <div class="prompt-text">"Refine this dashboard to Linear-level polish. Reference the Linear design system."</div>
+  </div>
+  <div class="prompt reveal" style="border-color:var(--purple);background:rgba(157,111,255,.03)">
+    <div class="prompt-title" style="color:var(--purple)">Build a new component</div>
+    <div class="prompt-text">"Build a login form using Stripe's design patterns — clean, minimal, high trust."</div>
+  </div>
+  <div class="prompt reveal" style="border-color:var(--purple);background:rgba(157,111,255,.03)">
+    <div class="prompt-title" style="color:var(--purple)">Self-critique loop</div>
+    <div class="prompt-text">"Review this UI against the Airbnb design system. Score it on all 5 dimensions and fix the lowest scoring one."</div>
+  </div>
+  <div class="prompt reveal" style="border-color:var(--purple);background:rgba(157,111,255,.03)">
+    <div class="prompt-title" style="color:var(--purple)">Dark cybersecurity tool</div>
+    <div class="prompt-text">"Style this SOC dashboard using Linear's dark theme tokens. Terminal aesthetic, high information density."</div>
+  </div>
+  <div class="prompt reveal" style="border-color:var(--purple);background:rgba(157,111,255,.03)">
+    <div class="prompt-title" style="color:var(--purple)">Generate visual artifact</div>
+    <div class="prompt-text">"Generate a PDF one-pager using Apple's design language. Clean, professional, minimal."</div>
+  </div>
+
+  <div class="card reveal" style="margin-top:16px;border-color:rgba(157,111,255,.2)">
+    <div class="card-label" style="color:var(--purple)">Best Systems for Your Work</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:4px">
+      <div style="text-align:center;padding:12px 8px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:700;margin-bottom:3px">Linear</div>
+        <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--muted)">dashboards</div>
+      </div>
+      <div style="text-align:center;padding:12px 8px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:700;margin-bottom:3px">Stripe</div>
+        <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--muted)">forms + trust</div>
+      </div>
+      <div style="text-align:center;padding:12px 8px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:700;margin-bottom:3px">Vercel</div>
+        <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--muted)">dark dev tools</div>
+      </div>
+      <div style="text-align:center;padding:12px 8px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:700;margin-bottom:3px">GitHub</div>
+        <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--muted)">code-adjacent UI</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════ ECC ══════════ -->
+<section class="tool" id="ecc">
+<div class="wrap">
+  <div class="tool-header reveal">
+    <div class="tool-icon" style="background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.2)">&#128737;</div>
+    <div class="tool-meta">
+      <div class="tool-num" style="color:var(--red)">04 — use 3 features, ignore 179</div>
+      <div class="tool-name">Everything Claude Code</div>
+      <div class="tool-sub">CVE scanning · injection blocking · token optimization</div>
+    </div>
+  </div>
+
+  <div class="card card-full reveal" style="border-color:rgba(255,77,109,.15)">
+    <div class="card-title" style="color:var(--red)">1. CVE Scanning</div>
+    <div class="card-text" style="margin:8px 0">Automatically checks every new dependency for known vulnerabilities. Runs silently — you only hear about it when something is flagged.</div>
+    <div class="code">
+<span class="cm"># Trigger manually on demand inside ds:</span>
+<span class="cv">"Scan all dependencies in this project for CVEs"</span>
+
+<span class="cm"># Or let it run automatically on every install</span>
+<span class="cm"># Already enabled: ds config set security.cve_scan true</span>
+    </div>
+  </div>
+
+  <div class="card card-full reveal" style="border-color:rgba(255,77,109,.15)">
+    <div class="card-title" style="color:var(--red)">2. Prompt Injection Blocking</div>
+    <div class="card-text" style="margin:8px 0">Intercepts malicious strings in user input before they reach the model. Critical when your app takes external input and passes it to AI. Runs automatically.</div>
+    <div class="code">
+<span class="cm"># Test it manually inside ds:</span>
+<span class="cv">"Check this user input for prompt injection: [paste suspicious string]"</span>
+
+<span class="cm"># Already enabled: ds config set security.injection_guard true</span>
+    </div>
+  </div>
+
+  <div class="card card-full reveal" style="border-color:rgba(255,77,109,.15)">
+    <div class="card-title" style="color:var(--red)">3. Token Optimization</div>
+    <div class="card-text" style="margin:8px 0">Compresses context before sending to the model. On large codebases cuts token bill roughly in half. Runs automatically once enabled.</div>
+    <div class="code">
+<span class="cm"># Already enabled if you ran:</span>
+<span class="ck">ds</span> config set tokens.optimize true
+
+<span class="cm"># Verify it's on:</span>
+<span class="ck">ds</span> config get tokens.optimize
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════ RUFLO ══════════ -->
+<section class="tool" id="ruflo">
+<div class="wrap">
+  <div class="tool-header reveal">
+    <div class="tool-icon" style="background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.2)">&#127960;</div>
+    <div class="tool-meta">
+      <div class="tool-num" style="color:var(--blue)">05 — parallel agent swarms</div>
+      <div class="tool-name">Ruflo</div>
+      <div class="tool-sub">when one claude isn't enough — run a hundred</div>
+    </div>
+  </div>
+
+  <p class="reveal" style="font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:28px">Ruflo runs multiple agents in parallel, each with a specific role, sharing memory. Instead of one agent doing everything sequentially — you get a development team.</p>
+
+  <div class="card-label reveal" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">// How to define a swarm</div>
+
+  <div class="code reveal" style="margin-bottom:20px">
+<span class="cm"># 1. Create .claude/swarm.json in your project</span>
+<span class="cv">{</span>
+  <span class="ck">"agents"</span>: [
+    { <span class="ck">"role"</span>: <span class="cs">"researcher"</span>, <span class="ck">"task"</span>: <span class="cs">"your research task"</span> },
+    { <span class="ck">"role"</span>: <span class="cs">"writer"</span>,     <span class="ck">"task"</span>: <span class="cs">"your build task"</span> },
+    { <span class="ck">"role"</span>: <span class="cs">"reviewer"</span>,   <span class="ck">"task"</span>: <span class="cs">"your review task"</span> }
+  ],
+  <span class="ck">"shared_memory"</span>: true
+<span class="cv">}</span>
+
+<span class="cm"># 2. Run it:</span>
+<span class="ck">ds</span> swarm run .claude/swarm.json
+  </div>
+
+  <div class="card-label reveal" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">// Ready-to-use swarm configs</div>
+
+  <div class="swarm reveal">
+    <div class="swarm-head" style="color:var(--blue)">Detection Engineering Swarm</div>
+    <div class="swarm-body">
+      <div class="code" style="margin-top:0">
+<span class="cv">{</span> <span class="ck">"agents"</span>: [
+  { <span class="ck">"role"</span>: <span class="cs">"researcher"</span>, <span class="ck">"task"</span>: <span class="cs">"map MITRE T1059.001 to detection opportunities"</span> },
+  { <span class="ck">"role"</span>: <span class="cs">"writer"</span>,     <span class="ck">"task"</span>: <span class="cs">"write SPL detection query for PowerShell abuse"</span> },
+  { <span class="ck">"role"</span>: <span class="cs">"tester"</span>,     <span class="ck">"task"</span>: <span class="cs">"validate query against sample logs in /logs"</span> }
+], <span class="ck">"shared_memory"</span>: true <span class="cv">}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="swarm reveal">
+    <div class="swarm-head" style="color:var(--green)">Full App Feature Swarm</div>
+    <div class="swarm-body">
+      <div class="code" style="margin-top:0">
+<span class="cv">{</span> <span class="ck">"agents"</span>: [
+  { <span class="ck">"role"</span>: <span class="cs">"backend"</span>,  <span class="ck">"task"</span>: <span class="cs">"build the API endpoint and DB schema"</span> },
+  { <span class="ck">"role"</span>: <span class="cs">"frontend"</span>, <span class="ck">"task"</span>: <span class="cs">"build the UI component for this feature"</span> },
+  { <span class="ck">"role"</span>: <span class="cs">"tests"</span>,    <span class="ck">"task"</span>: <span class="cs">"write unit and integration tests for both"</span> }
+], <span class="ck">"shared_memory"</span>: true <span class="cv">}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="swarm reveal">
+    <div class="swarm-head" style="color:var(--red)">Security Audit Swarm</div>
+    <div class="swarm-body">
+      <div class="code" style="margin-top:0">
+<span class="cv">{</span> <span class="ck">"agents"</span>: [
+  { <span class="ck">"role"</span>: <span class="cs">"scanner"</span>,  <span class="ck">"task"</span>: <span class="cs">"scan all files for hardcoded secrets and CVEs"</span> },
+  { <span class="ck">"role"</span>: <span class="cs">"reviewer"</span>, <span class="ck">"task"</span>: <span class="cs">"review auth logic for injection vulnerabilities"</span> },
+  { <span class="ck">"role"</span>: <span class="cs">"reporter"</span>, <span class="ck">"task"</span>: <span class="cs">"compile findings into a structured report"</span> }
+], <span class="ck">"shared_memory"</span>: true <span class="cv">}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="swarm reveal">
+    <div class="swarm-head" style="color:var(--yellow)">Job Hunting Swarm</div>
+    <div class="swarm-body">
+      <div class="code" style="margin-top:0">
+<span class="cv">{</span> <span class="ck">"agents"</span>: [
+  { <span class="ck">"role"</span>: <span class="cs">"scraper"</span>,  <span class="ck">"task"</span>: <span class="cs">"check LinkedIn + target company career pages for new roles"</span> },
+  { <span class="ck">"role"</span>: <span class="cs">"matcher"</span>,  <span class="ck">"task"</span>: <span class="cs">"match roles against resume in ~/vault/Job Search"</span> },
+  { <span class="ck">"role"</span>: <span class="cs">"ranker"</span>,   <span class="ck">"task"</span>: <span class="cs">"rank top 3 by fit score and flag application deadline"</span> }
+], <span class="ck">"shared_memory"</span>: true <span class="cv">}</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════ PRINTING PRESS ══════════ -->
+<section class="tool" id="printing">
+<div class="wrap">
+  <div class="tool-header reveal">
+    <div class="tool-icon" style="background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2)">&#128424;</div>
+    <div class="tool-meta">
+      <div class="tool-num" style="color:var(--green)">06 — install pre-built or build in 10 min</div>
+      <div class="tool-name">Printing Press + CLIs</div>
+      <div class="tool-sub">turns any website into a 5-token agent command</div>
+    </div>
+  </div>
+
+  <div class="card-label reveal" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">// Using pre-built CLIs</div>
+
+  <div class="card card-full reveal" style="border-color:rgba(0,255,136,.12)">
+    <div class="card-title" style="color:var(--green)">NVD — CVE feed</div>
+    <div class="code">
+<span class="ck">npx</span> -y @mvanhorn/printing-press-library install nvd
+<span class="cm"># Inside ds:</span>
+<span class="cv">"What critical CVEs dropped in the last 48 hours for Linux kernel?"</span>
+<span class="cv">"Any new CVEs affecting Python 3.11?"</span>
+    </div>
+  </div>
+
+  <div class="card card-full reveal" style="border-color:rgba(0,255,136,.12)">
+    <div class="card-title" style="color:var(--green)">scrape-creators — LinkedIn + 27 platforms</div>
+    <div class="code">
+<span class="ck">npx</span> -y @mvanhorn/printing-press-library install scrape-creators
+<span class="cm"># Inside ds:</span>
+<span class="cv">"Find security analyst hiring managers at Verizon on LinkedIn"</span>
+<span class="cv">"Scrape the profile of [person] on LinkedIn for networking context"</span>
+    </div>
+  </div>
+
+  <div class="card card-full reveal" style="border-color:rgba(0,255,136,.12)">
+    <div class="card-title" style="color:var(--green)">hackernews — daily security intel</div>
+    <div class="code">
+<span class="ck">npx</span> -y @mvanhorn/printing-press-library install hackernews
+<span class="cm"># Inside ds:</span>
+<span class="cv">"What are the top cybersecurity stories on HN today?"</span>
+<span class="cv">"Any HN threads about SIEM tools in the last week?"</span>
+    </div>
+  </div>
+
+  <div class="card card-full reveal" style="border-color:rgba(0,255,136,.12)">
+    <div class="card-title" style="color:var(--green)">Factory Skill — install this first</div>
+    <div class="card-text" style="margin:8px 0">Lets <code style="background:var(--surface2);padding:2px 5px;border-radius:3px;font-size:10px;font-family:'Space Mono',monospace">ds</code> build brand new CLIs on demand in plain English. Without this, you have to run build commands manually.</div>
+    <div class="code">
+<span class="ck">npx</span> skills add mvanhorn/cli-printing-press/skills -g -a claude-code -y
+<span class="cm"># After this, just tell ds in plain English:</span>
+<span class="cv">"Build me a CLI for [any website or tool]"</span>
+    </div>
+  </div>
+
+  <div class="card-label reveal" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;margin-top:8px">// Building a custom CLI</div>
+
+  <div class="code reveal" style="margin-bottom:16px">
+<span class="cm"># Build for any site — example: CISA advisories</span>
+<span class="ck">cli-printing-press</span> build --url https://www.cisa.gov/news-events/cybersecurity-advisories --name cisa
+
+<span class="cm"># Build for a job board</span>
+<span class="ck">cli-printing-press</span> build --url https://www.dice.com/jobs --name dice-jobs
+
+<span class="cm"># Verify it works</span>
+<span class="ck">cisa</span> --help
+  </div>
+
+  <div class="card card-full reveal" style="border-color:rgba(0,255,136,.12)">
+    <div class="card-title" style="color:var(--green)">Let ds build it for you (easiest)</div>
+    <div class="card-text" style="margin:8px 0">Open ds and say:</div>
+    <div class="prompt" style="border-color:var(--green);background:rgba(0,255,136,.03);margin-top:8px">
+      <div class="prompt-text">"Read printingpress.dev and build me a CLI for [site]. I want to be able to ask you [specific question] from the terminal."</div>
+    </div>
+    <div class="card-text" style="margin-top:8px">ds handles the entire build — auth, endpoints, binary generation, skill install.</div>
+  </div>
+
+  <div class="card-label reveal" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;margin-top:8px">// Job hunting automation</div>
+  <div class="card reveal" style="border-color:rgba(255,209,102,.15);background:rgba(255,209,102,.02)">
+    <div class="card-title" style="color:var(--yellow)">Morning job check — full workflow</div>
+    <div class="code" style="margin-top:10px">
+<span class="cm"># Install once:</span>
+<span class="ck">npx</span> -y @mvanhorn/printing-press-library install scrape-creators
+<span class="cm"># Build CLIs for target company career pages:</span>
+<span class="ck">cli-printing-press</span> build --url https://jobs.verizon.com --name verizon-jobs
+<span class="ck">cli-printing-press</span> build --url https://www.nightwing.com/careers --name nightwing-jobs
+
+<span class="cm"># Then every morning inside ds:</span>
+<span class="cv">"Check verizon-jobs, nightwing-jobs, and LinkedIn scrape-creators</span>
+<span class="cv"> for new security roles in the last 24 hours.</span>
+<span class="cv"> Match against my resume in ~/vault/Job Search.</span>
+<span class="cv"> Rank top 3 by fit and flag application deadlines."</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════ COMBO ══════════ -->
+<section class="tool" style="border-bottom:none">
+<div class="wrap">
+  <div class="tool-header reveal">
+    <div class="tool-icon" style="background:rgba(255,255,255,.04);border:1px solid var(--border2)">&#9881;</div>
+    <div class="tool-meta">
+      <div class="tool-num" style="color:var(--muted2)">07 — full stack in action</div>
+      <div class="tool-name">Combining All 6</div>
+      <div class="tool-sub">how the tools work together in real workflows</div>
+    </div>
+  </div>
+
+  <div class="combo reveal" style="margin-bottom:16px">
+    <div class="combo-title">Building a cybersecurity detection tool</div>
+    <div class="combo-row"><span class="combo-tag b-green">Printing Press</span> pulls fresh CVE data from NVD CLI — no browser, 5 tokens</div>
+    <div class="combo-row"><span class="combo-tag b-green">Karpathy</span> enforces surgical changes as you iterate on the script</div>
+    <div class="combo-row"><span class="combo-tag b-blue">Superpowers</span> writes the full spec before any code is touched</div>
+    <div class="combo-row"><span class="combo-tag b-blue">Ruflo</span> runs researcher + writer + tester agents in parallel</div>
+    <div class="combo-row"><span class="combo-tag b-red">ECC</span> scans every dependency and blocks injection attempts</div>
+    <div class="combo-row"><span class="combo-tag b-purple">Open Design</span> polishes the output dashboard to Vercel-level standard</div>
+  </div>
+
+  <div class="combo reveal">
+    <div class="combo-title">Morning workflow</div>
+    <div class="combo-row"><span class="combo-tag b-green">Obsidian</span> auto-loads your daily log and project context on startup</div>
+    <div class="combo-row"><span class="combo-tag b-green">NVD CLI</span> answers CVE questions in 5 tokens — no browser needed</div>
+    <div class="combo-row"><span class="combo-tag b-green">scrape-creators</span> checks LinkedIn for new security roles at target companies</div>
+    <div class="combo-row"><span class="combo-tag b-blue">Superpowers</span> forces a spec when you start building — no skipping ahead</div>
+    <div class="combo-row"><span class="combo-tag b-blue">Ruflo</span> parallelizes independent tasks — backend + frontend + tests simultaneously</div>
+    <div class="combo-row"><span class="combo-tag b-red">ECC</span> watches silently for CVEs and injection patterns the whole time</div>
+  </div>
+</div>
+</section>
+
+<footer>
+<div class="wrap">
+  <div class="footer-inner">
+    <div class="footer-l">
+      <div>// nova's tool usage instructions</div>
+      <div style="margin-top:4px;color:var(--muted)">SOC Analyst · ds alias configured</div>
+    </div>
+    <div class="footer-r">6 tools · 1 stack</div>
+  </div>
+</div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }});
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

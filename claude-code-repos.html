@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code Enhancement Stack</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08080f;--surface:#0f0f1a;--surface2:#15151f;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.12);--accent:#00d4ff;--accent2:#7c3aed;--accent3:#f43f5e;--accent4:#10b981;--text:#f1f1f5;--muted:#52526a;--muted2:#8888a0}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:64px 64px;pointer-events:none;z-index:0}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:100px 0 80px;position:relative}
+.hero-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:20px;opacity:0;animation:up .5s .1s forwards}
+.hero h1{font-size:clamp(40px,6.5vw,80px);font-weight:700;line-height:1.0;letter-spacing:-2px;margin-bottom:24px;opacity:0;animation:up .5s .25s forwards}
+.hero h1 em{font-style:normal;background:linear-gradient(120deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:16px;color:var(--muted2);max-width:520px;line-height:1.7;margin-bottom:40px;font-weight:300;opacity:0;animation:up .5s .4s forwards}
+.hero-chips{display:flex;gap:8px;flex-wrap:wrap;opacity:0;animation:up .5s .55s forwards}
+.chip{font-family:'JetBrains Mono',monospace;font-size:10px;padding:5px 12px;border:1px solid var(--border2);border-radius:100px;color:var(--muted2)}
+.chip.on{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,.05)}
+.orb{position:absolute;border-radius:50%;filter:blur(100px);pointer-events:none}
+.orb1{width:500px;height:500px;background:rgba(124,58,237,.12);top:-120px;right:-80px;animation:breathe 7s ease-in-out infinite alternate}
+.orb2{width:300px;height:300px;background:rgba(0,212,255,.07);bottom:80px;left:10%;animation:breathe 9s ease-in-out infinite alternate-reverse}
+.divider{height:1px;background:var(--border);position:relative;z-index:1}
+.sec{padding:88px 0;position:relative;z-index:1}
+.s-head{display:flex;align-items:center;gap:16px;margin-bottom:56px}
+.s-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:3px;white-space:nowrap}
+.s-line{flex:1;height:1px;background:var(--border)}
+.s-title{font-size:clamp(24px,3.5vw,38px);font-weight:700;letter-spacing:-1px}
+.repo-card{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border);border-radius:8px;margin-bottom:20px;background:var(--surface);overflow:hidden;transition:border-color .25s,transform .25s}
+.repo-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.rc-left{padding:36px;border-right:1px solid var(--border);position:relative;overflow:hidden}
+.rc-num{position:absolute;top:16px;right:20px;font-size:72px;font-weight:700;color:rgba(255,255,255,.03);font-family:'JetBrains Mono',monospace;line-height:1;pointer-events:none}
+.rc-badge{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border-radius:4px;margin-bottom:14px}
+.b-go{background:rgba(16,185,129,.1);color:var(--accent4);border:1px solid rgba(16,185,129,.2)}
+.b-core{background:rgba(0,212,255,.08);color:var(--accent);border:1px solid rgba(0,212,255,.18)}
+.b-adv{background:rgba(244,63,94,.08);color:var(--accent3);border:1px solid rgba(244,63,94,.18)}
+.b-design{background:rgba(124,58,237,.1);color:#a78bfa;border:1px solid rgba(124,58,237,.2)}
+.rc-name{font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px}
+.rc-handle{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:14px}
+.rc-desc{font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:22px}
+.rc-cmd{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);display:flex;align-items:center;gap:8px}
+.rc-cmd::before{content:'$';color:var(--muted)}
+.rc-right{padding:32px;background:var(--surface2)}
+.uc-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:18px}
+.uc-item{display:flex;gap:12px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.uc-item:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.uc-icon{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px}
+.uc-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.uc-text{font-size:12px;color:var(--muted2);line-height:1.6}
+.diagram-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:40px;margin-top:40px;overflow:hidden;position:relative}
+.diagram-box::before{content:attr(data-label);position:absolute;top:16px;right:20px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase}
+.diag-svg{width:100%;display:block}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:48px}
+.cg-col{padding:36px}
+.cg-col:first-child{background:var(--surface);border-right:1px solid var(--border)}
+.cg-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.cg-label.bad{color:var(--accent3)}.cg-label.good{color:var(--accent4)}
+.cg-item{display:flex;gap:10px;margin-bottom:13px;font-size:13px;color:var(--muted2);line-height:1.5}
+.cg-item::before{content:'x';color:var(--accent3);font-size:11px;flex-shrink:0;margin-top:2px;font-weight:700}
+.cg-col:last-child .cg-item::before{content:'v';color:var(--accent4)}
+.code-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:32px}
+.code-top{display:flex;align-items:center;gap:7px;padding:10px 18px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.dot{width:10px;height:10px;border-radius:50%}
+.dot-r{background:#ff5f57}.dot-y{background:#febc2e}.dot-g{background:#28c840}
+.code-fn{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-left:8px}
+.code-body{padding:24px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.9;overflow-x:auto}
+.cc{color:#3a3a50}.ck{color:var(--accent)}.cv{color:var(--accent4)}.cs{color:#a78bfa;font-weight:600}.cw{color:var(--accent3)}
+.matrix{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:48px}
+.mx-cell{border:1px solid var(--border);border-radius:8px;padding:22px;background:var(--surface);position:relative;transition:all .25s}
+.mx-cell:hover{transform:translateY(-2px);border-color:var(--border2)}
+.mx-pri{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.pri-now{color:var(--accent4)}.pri-week{color:var(--accent)}.pri-later{color:var(--muted)}
+.mx-repo{font-size:15px;font-weight:700;letter-spacing:-.3px;margin-bottom:7px}
+.mx-why{font-size:12px;color:var(--muted2);line-height:1.6}
+.mx-dot{position:absolute;top:14px;right:14px;width:7px;height:7px;border-radius:50%}
+.md-now{background:var(--accent4);box-shadow:0 0 8px var(--accent4);animation:blink 2s infinite}
+.md-week{background:var(--accent)}.md-later{background:var(--muted);opacity:.4}
+.tok-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:36px}
+.tok-card{border:1px solid var(--border);border-radius:8px;padding:24px;background:var(--surface2)}
+.tok-card.best{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.03)}
+.tok-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.tok-num{font-size:28px;font-weight:700;letter-spacing:-1px;margin-bottom:8px;font-family:'JetBrains Mono',monospace}
+.tok-desc{font-size:12px;color:var(--muted2);line-height:1.6}
+.tok-stats{margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.tok-stat{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:3px}
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-top:14px}
+.lib-item{border:1px solid var(--border);border-radius:6px;padding:14px;background:var(--surface2)}
+.lib-item.hot{border-color:rgba(0,212,255,.25);background:rgba(0,212,255,.03)}
+.lib-name{font-size:12px;font-weight:600;margin-bottom:3px}
+.lib-note{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted)}
+.lib-note.ac{color:var(--accent4)}.lib-note.bl{color:var(--accent)}
+.warn-box{border:1px solid rgba(244,63,94,.2);border-radius:8px;padding:22px 26px;background:rgba(244,63,94,.03);display:flex;gap:14px;margin-top:20px}
+.footer{padding:56px 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.footer-l,.footer-r{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);line-height:1.8}
+.footer-r{text-align:right}
+.fa{color:var(--accent)}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .5s,transform .5s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+@keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes breathe{from{opacity:.6;transform:scale(1)}to{opacity:1;transform:scale(1.08)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes dash{to{stroke-dashoffset:0}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes nodePop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@keyframes flowPulse{0%,100%{opacity:.15}50%{opacity:.7}}
+@keyframes slideR{from{transform:translateX(-10px);opacity:0}to{transform:translateX(0);opacity:1}}
+@media(max-width:768px){.repo-card,.compare-grid{grid-template-columns:1fr}.rc-left{border-right:none;border-bottom:1px solid var(--border)}.matrix,.tok-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.matrix,.tok-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<section class="hero">
+<div class="orb orb1"></div><div class="orb orb2"></div>
+<div class="wrap">
+  <div class="hero-label">// claude code enhancement stack</div>
+  <h1>6 Repos +<br><em>CLI Connectors</em></h1>
+  <p class="hero-sub">From autocomplete to a disciplined senior engineer. Every tool explained — what it does, why it matters, where it fits your workflow.</p>
+  <div class="hero-chips">
+    <span class="chip on">SOC Analyst</span><span class="chip on">AskCMMC.ai</span><span class="chip on">Aurora / NEXUS</span><span class="chip">SIEM Labs</span><span class="chip">Agentic Builds</span>
+  </div>
+</div>
+</section>
+<div class="divider"></div>
+
+<!-- ECOSYSTEM DIAGRAM -->
+<section class="sec">
+<div class="wrap">
+  <div class="s-head reveal"><span class="s-num">00</span><div class="s-line"></div><h2 class="s-title">The Ecosystem</h2></div>
+  <p class="reveal" style="color:var(--muted2);font-size:14px;max-width:560px;line-height:1.7;font-weight:300;margin-bottom:0">All 6 repos + CLI connectors orbit a single enhanced Claude Code core. Each one adds a layer of discipline, context, design, or speed.</p>
+  <div class="diagram-box reveal" data-label="ECOSYSTEM">
+    <svg class="diag-svg" viewBox="0 0 960 430" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="rgba(0,212,255,.7)"/></marker>
+        <marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="rgba(124,58,237,.7)"/></marker>
+        <marker id="a3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="rgba(16,185,129,.7)"/></marker>
+      </defs>
+      <!-- CENTER -->
+      <g style="opacity:0;animation:nodePop .5s .3s forwards">
+        <rect x="370" y="165" width="220" height="90" rx="8" fill="#0f0f1a" stroke="rgba(0,212,255,.5)" stroke-width="1.5"/>
+        <text x="480" y="204" text-anchor="middle" font-family="Inter" font-weight="700" font-size="16" fill="#f1f1f5">Claude Code</text>
+        <text x="480" y="224" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="rgba(0,212,255,.8)">enhanced core</text>
+        <rect x="370" y="165" width="220" height="90" rx="8" fill="none" stroke="rgba(0,212,255,.1)" stroke-width="12" style="animation:flowPulse 3s infinite"/>
+      </g>
+      <!-- Karpathy TL -->
+      <g style="opacity:0;animation:nodePop .4s .65s forwards">
+        <rect x="30" y="22" width="160" height="58" rx="6" fill="#15151f" stroke="rgba(16,185,129,.4)" stroke-width="1"/>
+        <text x="110" y="47" text-anchor="middle" font-family="Inter" font-weight="600" font-size="12" fill="#f1f1f5">Karpathy</text>
+        <text x="110" y="65" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(16,185,129,.8)">discipline rules</text>
+      </g>
+      <path d="M190,51 Q290,51 370,198" stroke="rgba(16,185,129,.45)" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#a3)" style="stroke-dashoffset:360;animation:dash .9s 1s ease forwards"/>
+      <!-- Superpowers TC -->
+      <g style="opacity:0;animation:nodePop .4s .75s forwards">
+        <rect x="370" y="22" width="160" height="58" rx="6" fill="#15151f" stroke="rgba(0,212,255,.4)" stroke-width="1"/>
+        <text x="450" y="47" text-anchor="middle" font-family="Inter" font-weight="600" font-size="12" fill="#f1f1f5">Superpowers</text>
+        <text x="450" y="65" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(0,212,255,.8)">planning + agents</text>
+      </g>
+      <path d="M450,80 L450,165" stroke="rgba(0,212,255,.45)" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#a1)" style="stroke-dashoffset:87;animation:dash .5s 1.05s ease forwards"/>
+      <!-- Open Design TR -->
+      <g style="opacity:0;animation:nodePop .4s .85s forwards">
+        <rect x="730" y="22" width="160" height="58" rx="6" fill="#15151f" stroke="rgba(124,58,237,.4)" stroke-width="1"/>
+        <text x="810" y="47" text-anchor="middle" font-family="Inter" font-weight="600" font-size="12" fill="#f1f1f5">Open Design</text>
+        <text x="810" y="65" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(167,139,250,.8)">design systems</text>
+      </g>
+      <path d="M772,80 Q625,115 590,165" stroke="rgba(124,58,237,.45)" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#a2)" style="stroke-dashoffset:315;animation:dash .9s 1.1s ease forwards"/>
+      <!-- Obsidian BL -->
+      <g style="opacity:0;animation:nodePop .4s .95s forwards">
+        <rect x="30" y="348" width="160" height="58" rx="6" fill="#15151f" stroke="rgba(124,58,237,.4)" stroke-width="1"/>
+        <text x="110" y="373" text-anchor="middle" font-family="Inter" font-weight="600" font-size="12" fill="#f1f1f5">Obsidian Skills</text>
+        <text x="110" y="391" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(167,139,250,.8)">second brain</text>
+      </g>
+      <path d="M190,377 Q290,377 370,240" stroke="rgba(124,58,237,.45)" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#a2)" style="stroke-dashoffset:315;animation:dash .9s 1.15s ease forwards"/>
+      <!-- Everything CC BC -->
+      <g style="opacity:0;animation:nodePop .4s 1.05s forwards">
+        <rect x="370" y="348" width="160" height="58" rx="6" fill="#15151f" stroke="rgba(244,63,94,.35)" stroke-width="1"/>
+        <text x="450" y="368" text-anchor="middle" font-family="Inter" font-weight="600" font-size="11" fill="#f1f1f5">Everything CC</text>
+        <text x="450" y="391" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(244,63,94,.8)">security + tokens</text>
+      </g>
+      <path d="M450,348 L450,255" stroke="rgba(244,63,94,.45)" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#a1)" style="stroke-dashoffset:95;animation:dash .5s 1.2s ease forwards"/>
+      <!-- Roof Flow BR muted -->
+      <g style="opacity:0;animation:nodePop .4s 1.15s forwards">
+        <rect x="730" y="348" width="160" height="58" rx="6" fill="#15151f" stroke="rgba(0,212,255,.18)" stroke-width="1" stroke-dasharray="5 3"/>
+        <text x="810" y="373" text-anchor="middle" font-family="Inter" font-weight="600" font-size="12" fill="rgba(241,241,245,.45)">Roof Flow</text>
+        <text x="810" y="391" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(0,212,255,.35)">swarm (later)</text>
+      </g>
+      <path d="M772,348 Q642,308 590,255" stroke="rgba(0,212,255,.18)" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#a1)" style="stroke-dashoffset:315;animation:dash .9s 1.25s ease forwards"/>
+      <!-- CLI badge right -->
+      <g style="opacity:0;animation:fadeIn .5s 1.6s forwards">
+        <rect x="822" y="192" width="118" height="46" rx="5" fill="rgba(16,185,129,.07)" stroke="rgba(16,185,129,.3)" stroke-width="1"/>
+        <text x="881" y="212" text-anchor="middle" font-family="Inter" font-weight="600" font-size="11" fill="rgba(16,185,129,.9)">CLI Connectors</text>
+        <text x="881" y="229" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(16,185,129,.6)">Printing Press</text>
+      </g>
+      <path d="M822,215 L590,220" stroke="rgba(16,185,129,.3)" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#a3)" style="stroke-dashoffset:232;animation:dash .6s 1.8s ease forwards"/>
+    </svg>
+  </div>
+</div>
+</section>
+<div class="divider"></div>
+
+<!-- REPO CARDS -->
+<section class="sec">
+<div class="wrap">
+  <div class="s-head reveal"><span class="s-num">01</span><div class="s-line"></div><h2 class="s-title">The Six Repos</h2></div>
+  <div class="repo-card reveal">
+    <div class="rc-left"><div class="rc-num">01</div>
+      <div class="rc-badge b-go">Install Today</div>
+      <div class="rc-name">Karpathy Guidelines</div>
+      <div class="rc-handle">karpathy-claude-code-guidelines</div>
+      <p class="rc-desc">A single CLAUDE.md encoding Andrej Karpathy's 4 principles. Think before code. Build the simplest thing. Surgical changes only. Do not improve what was not asked.</p>
+      <div class="rc-cmd">plugin install karpathy-claude-code-guidelines</div>
+    </div>
+    <div class="rc-right"><div class="uc-label">Your Use Cases</div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(16,185,129,.1)">&#128274;</div><div><div class="uc-title" style="color:var(--accent4)">SOC Scripts — No Rogue Refactors</div><div class="uc-text">Fix SSH brute-force detection, it fixes that only. Your triage scripts stay untouched.</div></div></div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(0,212,255,.08)">&#129313;</div><div><div class="uc-title" style="color:var(--accent)">Aurora — Bug Isolation</div><div class="uc-text">Fixes the blocked-user persistence bug without touching the chat module.</div></div></div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(124,58,237,.1)">&#9989;</div><div><div class="uc-title" style="color:#a78bfa">Define Done Before Starting</div><div class="uc-text">Claude writes success criteria before writing code. No more infinite loops.</div></div></div>
+    </div>
+  </div>
+  <div class="repo-card reveal">
+    <div class="rc-left"><div class="rc-num">02</div>
+      <div class="rc-badge b-core">Core Stack</div>
+      <div class="rc-name">Superpowers</div>
+      <div class="rc-handle">github.com/obra/superpowers</div>
+      <p class="rc-desc">Full dev methodology. Specs before code, parallel sub-agents, TDD discipline, branch management. Auto-triggers on install — no manual activation needed.</p>
+      <div class="rc-cmd">plugin install superpowers</div>
+    </div>
+    <div class="rc-right"><div class="uc-label">Your Use Cases</div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(0,212,255,.08)">&#128203;</div><div><div class="uc-title" style="color:var(--accent)">AskCMMC.ai — Spec Before Build</div><div class="uc-text">Writes full architecture and edge cases before touching the compliance query engine.</div></div></div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(16,185,129,.1)">&#9889;</div><div><div class="uc-title" style="color:var(--accent4)">Parallel Agent Dispatch</div><div class="uc-text">One agent on CMMC query engine, another on UI — simultaneously.</div></div></div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(124,58,237,.1)">&#127807;</div><div><div class="uc-title" style="color:#a78bfa">Aurora — Branch Discipline</div><div class="uc-text">Finishes branch, self-reviews, pushes to GitHub cleanly. No half-baked merges.</div></div></div>
+    </div>
+  </div>
+  <div class="repo-card reveal">
+    <div class="rc-left"><div class="rc-num">03</div>
+      <div class="rc-badge b-design">Design</div>
+      <div class="rc-name">Open Design</div>
+      <div class="rc-handle">github.com/nexu-io/open-design</div>
+      <p class="rc-desc">72 brand-grade design systems baked in — Linear, Stripe, Airbnb, Notion, Apple. 5-dimensional self-critique. Ships visual artifacts you can see immediately.</p>
+      <div class="rc-cmd">git clone github.com/nexu-io/open-design</div>
+    </div>
+    <div class="rc-right"><div class="uc-label">Your Use Cases</div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(124,58,237,.1)">&#127912;</div><div><div class="uc-title" style="color:#a78bfa">Aurora DedSec UI Polish</div><div class="uc-text">"Refine to Linear-level polish" — it understands design language, not just CSS rules.</div></div></div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(0,212,255,.08)">&#127970;</div><div><div class="uc-title" style="color:var(--accent)">AskCMMC.ai — Credible UI</div><div class="uc-text">Defense contractors judge by aesthetics. Stripe-grade design makes it look production-ready.</div></div></div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(16,185,129,.1)">&#128196;</div><div><div class="uc-title" style="color:var(--accent4)">Pitch Decks and PDFs</div><div class="uc-text">Magazine-quality artifacts for IEEE presentations and CMMC one-pagers.</div></div></div>
+    </div>
+  </div>
+  <div class="repo-card reveal">
+    <div class="rc-left"><div class="rc-num">04</div>
+      <div class="rc-badge b-core">Second Brain</div>
+      <div class="rc-name">Obsidian Skills</div>
+      <div class="rc-handle">github.com/compano/obsidian-skills</div>
+      <p class="rc-desc">Native bridge between your Obsidian vaults and Claude Code. Understands wiki-links, callouts, properties, JSON Canvas. Stop copy-pasting context manually.</p>
+      <div class="rc-cmd">plugin install obsidian-skills</div>
+    </div>
+    <div class="rc-right"><div class="uc-label">Your Use Cases</div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(244,63,94,.08)">&#128269;</div><div><div class="uc-title" style="color:var(--accent3)">Threat Hunting Docs into Queries</div><div class="uc-text">RedSun KQL docs and MITRE mappings feed directly into Claude Code sessions.</div></div></div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(0,212,255,.08)">&#128218;</div><div><div class="uc-title" style="color:var(--accent)">CMMC Vault into AskCMMC</div><div class="uc-text">Your research vault becomes live context for compliance answer generation.</div></div></div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(16,185,129,.1)">&#127991;</div><div><div class="uc-title" style="color:var(--accent4)">Brand and Architecture Context</div><div class="uc-text">Agents pull your brand guidelines and architecture notes automatically.</div></div></div>
+    </div>
+  </div>
+  <div class="repo-card reveal">
+    <div class="rc-left"><div class="rc-num">05</div>
+      <div class="rc-badge b-core">Security Bonus</div>
+      <div class="rc-name">Everything Claude Code</div>
+      <div class="rc-handle">github.com/everything-claude-code</div>
+      <p class="rc-desc">48 specialized agents, 182 skills, 68 commands. CVE scanning, prompt injection blocking, token optimization that cuts your bill in half. Hackathon winner.</p>
+      <div class="rc-cmd">plugin install everything-claude-code</div>
+    </div>
+    <div class="rc-right"><div class="uc-label">Your Use Cases</div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(244,63,94,.08)">&#128737;</div><div><div class="uc-title" style="color:var(--accent3)">CVE Scanning in Dev Env</div><div class="uc-text">Natural fit as a SOC analyst — catches vulnerabilities before they ship.</div></div></div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(0,212,255,.08)">&#128176;</div><div><div class="uc-title" style="color:var(--accent)">Token Cost Cut in Half</div><div class="uc-text">Heavy AskCMMC API usage? Token optimization alone pays for itself.</div></div></div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(124,58,237,.1)">&#128683;</div><div><div class="uc-title" style="color:#a78bfa">Prompt Injection Blocking</div><div class="uc-text">Critical when AskCMMC handles user-submitted compliance questions from contractors.</div></div></div>
+    </div>
+  </div>
+  <div class="repo-card reveal">
+    <div class="rc-left"><div class="rc-num">06</div>
+      <div class="rc-badge b-adv">Graduate To</div>
+      <div class="rc-name">Roof Flow</div>
+      <div class="rc-handle">github.com/roof-flow</div>
+      <p class="rc-desc">100 specialized agents that self-organize into swarms. Shared memory across sessions. Federated comms — agents on your machine talk securely to teammates' machines.</p>
+      <div class="rc-cmd">plugin install roof-flow</div>
+    </div>
+    <div class="rc-right"><div class="uc-label">Future Use Cases</div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(244,63,94,.08)">&#127760;</div><div><div class="uc-title" style="color:var(--accent3)">AskCMMC at Scale</div><div class="uc-text">Agent 1 monitors queries. Agent 2 handles doc updates. Agent 3 manages sessions — all parallel.</div></div></div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(0,212,255,.08)">&#128101;</div><div><div class="uc-title" style="color:var(--accent)">Team Builds</div><div class="uc-text">Your machine's agents talk securely to Sudofy and future team machines.</div></div></div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(16,185,129,.1)">&#128257;</div><div><div class="uc-title" style="color:var(--accent4)">SIEM Lab Automation</div><div class="uc-text">Multiple agents running detection logic and log parsing simultaneously.</div></div></div>
+    </div>
+  </div>
+</div>
+</section>
+<div class="divider"></div>
+
+<!-- WORKFLOW DIAGRAM -->
+<section class="sec">
+<div class="wrap">
+  <div class="s-head reveal"><span class="s-num">02</span><div class="s-line"></div><h2 class="s-title">How They Work Together</h2></div>
+  <div class="diagram-box reveal" data-label="WORKFLOW">
+    <svg class="diag-svg" viewBox="0 0 960 310" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="wa" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3z" fill="rgba(0,212,255,.8)"/></marker>
+        <marker id="wg" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3z" fill="rgba(16,185,129,.8)"/></marker>
+        <marker id="wp" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3z" fill="rgba(124,58,237,.6)"/></marker>
+        <marker id="wr" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3z" fill="rgba(244,63,94,.5)"/></marker>
+      </defs>
+      <!-- Row 1: main flow -->
+      <g style="animation:slideR .4s .2s both">
+        <rect x="20" y="115" width="118" height="55" rx="6" fill="#0f0f1a" stroke="rgba(0,212,255,.5)" stroke-width="1.5"/>
+        <text x="79" y="140" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(0,212,255,.7)" letter-spacing="2">YOU</text>
+        <text x="79" y="158" text-anchor="middle" font-family="Inter" font-weight="600" font-size="11" fill="#f1f1f5">"Build X"</text>
+      </g>
+      <path d="M138,143 L180,143" stroke="rgba(0,212,255,.5)" stroke-width="1.5" marker-end="url(#wa)" style="stroke-dasharray:42;stroke-dashoffset:42;animation:dash .3s .55s forwards"/>
+      <g style="animation:slideR .4s .6s both">
+        <rect x="180" y="100" width="122" height="86" rx="6" fill="#0f0f1a" stroke="rgba(16,185,129,.4)" stroke-width="1"/>
+        <text x="241" y="121" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(16,185,129,.7)" letter-spacing="1">KARPATHY</text>
+        <text x="241" y="140" text-anchor="middle" font-family="Inter" font-weight="600" font-size="11" fill="#f1f1f5">Success criteria</text>
+        <text x="241" y="157" text-anchor="middle" font-family="Inter" font-size="10" fill="rgba(241,241,245,.45)">defined first</text>
+        <rect x="200" y="167" width="82" height="12" rx="3" fill="rgba(16,185,129,.07)"/>
+        <text x="241" y="177" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(16,185,129,.6)">surgical only</text>
+      </g>
+      <path d="M302,143 L344,143" stroke="rgba(0,212,255,.5)" stroke-width="1.5" marker-end="url(#wa)" style="stroke-dasharray:42;stroke-dashoffset:42;animation:dash .3s .9s forwards"/>
+      <g style="animation:slideR .4s 1s both">
+        <rect x="344" y="82" width="138" height="122" rx="6" fill="#0f0f1a" stroke="rgba(0,212,255,.5)" stroke-width="1.5"/>
+        <text x="413" y="103" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(0,212,255,.8)" letter-spacing="1">SUPERPOWERS</text>
+        <line x1="360" y1="112" x2="466" y2="112" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+        <text x="413" y="130" text-anchor="middle" font-family="Inter" font-weight="600" font-size="11" fill="#f1f1f5">Write spec file</text>
+        <text x="413" y="148" text-anchor="middle" font-family="Inter" font-size="10" fill="rgba(241,241,245,.45)">Dispatch parallel</text>
+        <text x="413" y="164" text-anchor="middle" font-family="Inter" font-size="10" fill="rgba(241,241,245,.45)">sub-agents</text>
+        <rect x="365" y="176" width="96" height="12" rx="3" fill="rgba(0,212,255,.06)"/>
+        <text x="413" y="186" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(0,212,255,.6)">2-5 min plan</text>
+      </g>
+      <path d="M482,143 L524,143" stroke="rgba(0,212,255,.5)" stroke-width="1.5" marker-end="url(#wa)" style="stroke-dasharray:42;stroke-dashoffset:42;animation:dash .3s 1.3s forwards"/>
+      <g style="animation:slideR .4s 1.4s both">
+        <rect x="524" y="100" width="122" height="86" rx="6" fill="#0f0f1a" stroke="rgba(124,58,237,.4)" stroke-width="1"/>
+        <text x="585" y="121" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(167,139,250,.7)" letter-spacing="1">OPEN DESIGN</text>
+        <text x="585" y="140" text-anchor="middle" font-family="Inter" font-weight="600" font-size="11" fill="#f1f1f5">Design system</text>
+        <text x="585" y="157" text-anchor="middle" font-family="Inter" font-size="10" fill="rgba(241,241,245,.45)">polish applied</text>
+        <rect x="545" y="167" width="80" height="12" rx="3" fill="rgba(124,58,237,.07)"/>
+        <text x="585" y="177" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(167,139,250,.6)">Linear-grade UI</text>
+      </g>
+      <path d="M646,143 L688,143" stroke="rgba(16,185,129,.6)" stroke-width="1.5" marker-end="url(#wg)" style="stroke-dasharray:42;stroke-dashoffset:42;animation:dash .3s 1.7s forwards"/>
+      <g style="animation:slideR .4s 1.8s both">
+        <rect x="688" y="115" width="252" height="55" rx="6" fill="rgba(16,185,129,.06)" stroke="rgba(16,185,129,.5)" stroke-width="1.5"/>
+        <text x="814" y="140" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(16,185,129,.8)" letter-spacing="2">RESULT</text>
+        <text x="814" y="158" text-anchor="middle" font-family="Inter" font-weight="600" font-size="12" fill="#10b981">Feature shipped — clean</text>
+        <rect x="688" y="115" width="252" height="55" rx="6" fill="none" stroke="rgba(16,185,129,.1)" stroke-width="10" style="animation:flowPulse 2.5s 2s infinite"/>
+      </g>
+      <!-- Obsidian top feeder -->
+      <g style="opacity:0;animation:fadeIn .3s 2.1s forwards">
+        <rect x="340" y="20" width="106" height="36" rx="5" fill="#15151f" stroke="rgba(124,58,237,.3)" stroke-width="1"/>
+        <text x="393" y="36" text-anchor="middle" font-family="Inter" font-weight="500" font-size="10" fill="rgba(241,241,245,.7)">Obsidian Vault</text>
+        <text x="393" y="50" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(167,139,250,.6)">live context</text>
+      </g>
+      <path d="M393,56 L393,82" stroke="rgba(124,58,237,.3)" stroke-width="1" stroke-dasharray="3 3" style="opacity:0;animation:fadeIn .3s 2.3s forwards" marker-end="url(#wp)"/>
+      <!-- ECC bottom feeder -->
+      <g style="opacity:0;animation:fadeIn .3s 2.2s forwards">
+        <rect x="340" y="250" width="106" height="36" rx="5" fill="#15151f" stroke="rgba(244,63,94,.3)" stroke-width="1"/>
+        <text x="393" y="266" text-anchor="middle" font-family="Inter" font-weight="500" font-size="10" fill="rgba(241,241,245,.7)">ECC Security</text>
+        <text x="393" y="280" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(244,63,94,.6)">CVE + injection</text>
+      </g>
+      <path d="M393,250 L393,204" stroke="rgba(244,63,94,.3)" stroke-width="1" stroke-dasharray="3 3" style="opacity:0;animation:fadeIn .3s 2.4s forwards" marker-end="url(#wr)"/>
+    </svg>
+  </div>
+</div>
+</section>
+<div class="divider"></div>
+
+<!-- BEFORE / AFTER -->
+<section class="sec">
+<div class="wrap">
+  <div class="s-head reveal"><span class="s-num">03</span><div class="s-line"></div><h2 class="s-title">Before vs After</h2></div>
+  <div class="compare-grid reveal">
+    <div class="cg-col">
+      <div class="cg-label bad">Without These Repos</div>
+      <div class="cg-item">Claude starts coding immediately, no planning</div>
+      <div class="cg-item">Fixes one bug, quietly refactors three other files</div>
+      <div class="cg-item">Forgets project context between sessions</div>
+      <div class="cg-item">UI looks generic — no design system awareness</div>
+      <div class="cg-item">Copy-paste Obsidian notes manually every time</div>
+      <div class="cg-item">No CVE checking in dev environment</div>
+      <div class="cg-item">Agents run sequentially — slow builds</div>
+      <div class="cg-item">Done is undefined — loops indefinitely</div>
+    </div>
+    <div class="cg-col">
+      <div class="cg-label good">With These Repos</div>
+      <div class="cg-item">Spec written, success criteria defined before code</div>
+      <div class="cg-item">Surgical changes only — Karpathy rule enforced</div>
+      <div class="cg-item">Obsidian vault feeds live context automatically</div>
+      <div class="cg-item">Open Design applies Linear/Stripe-level polish</div>
+      <div class="cg-item">CMMC vault wired directly into AskCMMC</div>
+      <div class="cg-item">CVE scanning baked into every build</div>
+      <div class="cg-item">Superpowers dispatches parallel sub-agents</div>
+      <div class="cg-item">Done = criteria met, branch reviewed, pushed clean</div>
+    </div>
+  </div>
+</div>
+</section>
+<div class="divider"></div>
+
+<!-- CLAUDE.MD -->
+<section class="sec">
+<div class="wrap">
+  <div class="s-head reveal"><span class="s-num">04</span><div class="s-line"></div><h2 class="s-title">Your CLAUDE.md</h2></div>
+  <p class="reveal" style="color:var(--muted2);font-size:14px;max-width:580px;line-height:1.7;font-weight:300">Drop this in your project root. Every repo's rules activate with full project context.</p>
+  <div class="code-box reveal">
+    <div class="code-top"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="code-fn">CLAUDE.md — AskCMMC.ai / Aurora</span></div>
+    <div class="code-body">
+<span class="cs"># Project: AskCMMC.ai Compliance Assistant</span>
+
+<span class="cc"># KARPATHY RULES</span>
+<span class="ck">BEFORE_CODE:</span>
+  <span class="cv">- Write success criteria in a comment block first</span>
+  <span class="cv">- Build the simplest thing that works</span>
+  <span class="cw">  DO NOT refactor files not mentioned in the task</span>
+
+<span class="cc"># PROJECT CONTEXT</span>
+<span class="ck">STACK:</span>
+  <span class="cv">- Frontend: Vanilla JS, glassmorphism, DedSec aesthetic</span>
+  <span class="cv">- Backend: Supabase (Postgres + realtime) · Deploy: Netlify</span>
+
+<span class="ck">OBSIDIAN_VAULT:</span>
+  <span class="cv">- ~/vault/CMMC       # compliance research</span>
+  <span class="cv">- ~/vault/RedSun     # threat hunting, KQL queries</span>
+
+<span class="cc"># SUPERPOWERS</span>
+<span class="ck">PLANNING:</span>
+  <span class="cv">- Spec file required before any feature build</span>
+  <span class="cv">- Parallel agents for UI + logic layers</span>
+
+<span class="cc"># NEVER DO</span>
+<span class="cw">FORBIDDEN:</span>
+  <span class="cw">- Modify Supabase schema without explicit instruction</span>
+  <span class="cw">- Rename files or restructure folders unprompted</span>
+    </div>
+      <div class="mx-cell"><div class="mx-dot md-now"></div><div class="mx-pri pri-now">Install Today</div><div class="mx-repo">Printing Press</div><div class="mx-why">CLI connectors for CVE feeds, local tool scraping, and agent scheduling. Install Go first.</div></div>
+    <div class="mx-cell" style="border-color:rgba(244,63,94,.2);background:rgba(244,63,94,.02)"><div class="mx-dot" style="background:var(--accent3)"></div><div class="mx-pri" style="color:var(--accent3)">Bonus Layer</div><div class="mx-repo">DeepSeek Swap</div><div class="mx-why">Route Claude Code to DeepSeek API for cheap batch runs and experiments. Keep Claude for production.</div></div>
+  </div>
+</div>
+</section>
+<div class="divider"></div>
+
+<!-- CLI CONNECTORS -->
+<section class="sec">
+<div class="wrap">
+  <div class="s-head reveal"><span class="s-num">05</span><div class="s-line"></div><h2 class="s-title">CLI Connectors</h2></div>
+  <p class="reveal" style="color:var(--muted2);font-size:14px;max-width:600px;line-height:1.7;font-weight:300;margin-bottom:40px">Leaner than MCPs. About 5 tokens per call vs 35+ for MCP. Built for agents from day one — set auth once and forget it.</p>
+  <div class="tok-grid reveal">
+    <div class="tok-card"><div class="tok-label" style="color:var(--accent3)">API</div><div class="tok-num" style="color:var(--accent3)">Heavy</div><div class="tok-desc">Raw JSON dump. Agent unpacks everything. Slow and expensive on tokens. Like being handed every newspaper instead of the one article you need.</div><div class="tok-stats"><div class="tok-stat">Reliability: decent</div><div class="tok-stat">Speed: slow</div><div class="tok-stat">Auth: per call</div></div></div>
+    <div class="tok-card"><div class="tok-label" style="color:var(--accent)">MCP</div><div class="tok-num" style="color:var(--accent)">35+ tokens</div><div class="tok-desc">Loads entire toolbox into memory every single call. Even if you need one tool it reads every label — bloats your context window fast.</div><div class="tok-stats"><div class="tok-stat">Reliability: 72%</div><div class="tok-stat">Speed: moderate</div><div class="tok-stat">Auth: per session</div></div></div>
+    <div class="tok-card best"><div class="tok-label" style="color:var(--accent4)">CLI — use this</div><div class="tok-num" style="color:var(--accent4)">~5 tokens</div><div class="tok-desc">One command. One job. Clean preformatted answer — no raw JSON. Built for agents from day one. Set auth once and forget it.</div><div class="tok-stats"><div class="tok-stat" style="color:var(--accent4)">Reliability: immediate</div><div class="tok-stat" style="color:var(--accent4)">Speed: local / instant</div><div class="tok-stat" style="color:var(--accent4)">Auth: set once</div></div></div>
+  </div>
+  <!-- CLI Flow Diagram -->
+  <div class="diagram-box reveal" data-label="CLI FLOW" style="margin-top:32px">
+    <svg class="diag-svg" viewBox="0 0 960 230" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ca" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3z" fill="rgba(16,185,129,.8)"/></marker>
+        <marker id="cb" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3z" fill="rgba(0,212,255,.5)"/></marker>
+      </defs>
+      <g style="animation:nodePop .4s .2s both">
+        <rect x="20" y="75" width="138" height="66" rx="6" fill="#0f0f1a" stroke="rgba(0,212,255,.4)" stroke-width="1.5"/>
+        <text x="89" y="101" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(0,212,255,.7)" letter-spacing="2">CLAUDE</text>
+        <text x="89" y="120" text-anchor="middle" font-family="Inter" font-weight="600" font-size="12" fill="#f1f1f5">Your Agent</text>
+        <text x="89" y="135" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(241,241,245,.3)">Nova / AskCMMC</text>
+      </g>
+      <path d="M158,108 L228,108" stroke="rgba(16,185,129,.6)" stroke-width="1.5" marker-end="url(#ca)" style="stroke-dasharray:70;stroke-dashoffset:70;animation:dash .4s .6s forwards"/>
+      <text x="193" y="98" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(16,185,129,.5)" style="opacity:0;animation:fadeIn .3s .9s forwards">1 cmd</text>
+      <g style="animation:nodePop .4s .7s both">
+        <rect x="228" y="56" width="158" height="108" rx="6" fill="#0f0f1a" stroke="rgba(16,185,129,.5)" stroke-width="1.5"/>
+        <text x="307" y="78" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(16,185,129,.8)" letter-spacing="1">PRINTING PRESS</text>
+        <line x1="244" y1="87" x2="370" y2="87" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+        <text x="307" y="105" text-anchor="middle" font-family="Inter" font-weight="600" font-size="11" fill="#f1f1f5">CLI Factory</text>
+        <text x="307" y="122" text-anchor="middle" font-family="Inter" font-size="10" fill="rgba(241,241,245,.45)">Library + build your own</text>
+        <rect x="248" y="137" width="118" height="13" rx="3" fill="rgba(16,185,129,.07)"/>
+        <text x="307" y="148" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(16,185,129,.6)">requires Go installed</text>
+      </g>
+      <path d="M386,108 L450,108" stroke="rgba(16,185,129,.6)" stroke-width="1.5" marker-end="url(#ca)" style="stroke-dasharray:64;stroke-dashoffset:64;animation:dash .4s 1.1s forwards"/>
+      <g style="opacity:0;animation:fadeIn .3s 1.2s forwards">
+        <rect x="450" y="14" width="124" height="40" rx="5" fill="#15151f" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
+        <text x="512" y="32" text-anchor="middle" font-family="Inter" font-weight="500" font-size="10" fill="rgba(241,241,245,.8)">CMMC Sources</text>
+        <text x="512" y="47" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(0,212,255,.5)">no public API</text>
+      </g>
+      <path d="M450,90 Q443,60 450,54" stroke="rgba(0,212,255,.25)" stroke-width="1" stroke-dasharray="3 3" style="opacity:0;animation:fadeIn .3s 1.3s forwards" marker-end="url(#cb)"/>
+      <g style="opacity:0;animation:fadeIn .3s 1.25s forwards">
+        <rect x="450" y="90" width="124" height="40" rx="5" fill="#15151f" stroke="rgba(244,63,94,.3)" stroke-width="1"/>
+        <text x="512" y="108" text-anchor="middle" font-family="Inter" font-weight="500" font-size="10" fill="rgba(241,241,245,.8)">CVE Feeds</text>
+        <text x="512" y="123" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(244,63,94,.5)">SOC intel</text>
+      </g>
+      <g style="opacity:0;animation:fadeIn .3s 1.3s forwards">
+        <rect x="450" y="166" width="124" height="40" rx="5" fill="#15151f" stroke="rgba(16,185,129,.3)" stroke-width="1"/>
+        <text x="512" y="184" text-anchor="middle" font-family="Inter" font-weight="500" font-size="10" fill="rgba(241,241,245,.8)">Google Search</text>
+        <text x="512" y="199" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(16,185,129,.5)">AskCMMC SEO</text>
+      </g>
+      <path d="M574,110 L648,110" stroke="rgba(16,185,129,.6)" stroke-width="1.5" marker-end="url(#ca)" style="stroke-dasharray:74;stroke-dashoffset:74;animation:dash .4s 1.5s forwards"/>
+      <text x="611" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(16,185,129,.5)" style="opacity:0;animation:fadeIn .3s 1.7s forwards">~5 tokens</text>
+      <g style="opacity:0;animation:nodePop .4s 1.6s forwards">
+        <rect x="648" y="78" width="288" height="66" rx="6" fill="rgba(16,185,129,.06)" stroke="rgba(16,185,129,.4)" stroke-width="1.5"/>
+        <text x="792" y="103" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(16,185,129,.7)" letter-spacing="2">CLEAN ANSWER</text>
+        <text x="792" y="123" text-anchor="middle" font-family="Inter" font-weight="600" font-size="11" fill="#f1f1f5">Preformatted data, no JSON blob</text>
+        <text x="792" y="138" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(16,185,129,.5)">instant response, minimal tokens</text>
+      </g>
+    </svg>
+  </div>
+  <!-- Printing Press card -->
+  <div class="repo-card reveal" style="margin-top:24px">
+    <div class="rc-left"><div class="rc-num">+</div>
+      <div class="rc-badge b-core">The Factory</div>
+      <div class="rc-name">Printing Press</div>
+      <div class="rc-handle">github.com/nate-hurt/printing-press</div>
+      <p class="rc-desc">Pre-built CLI library plus a factory that turns any website into your own custom CLI. Install the agent once — it builds new connectors on your behalf forever. Requires Go first.</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="rc-cmd" style="color:var(--muted2)">install Go from go.dev/dl first</div>
+        <div class="rc-cmd">git clone github.com/nate-hurt/printing-press</div>
+      </div>
+    </div>
+    <div class="rc-right"><div class="uc-label">Your Use Cases</div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(0,212,255,.08)">&#128203;</div><div><div class="uc-title" style="color:var(--accent)">CMMC Updates into AskCMMC</div><div class="uc-text">CLI scrapes DoD updates on schedule, feeds fresh data without browser takeover or token bloat.</div></div></div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(244,63,94,.08)">&#128737;</div><div><div class="uc-title" style="color:var(--accent3)">CVE Feeds into SOC Digest</div><div class="uc-text">Wire threat intel sources that lack clean APIs. Daily Claude digest, near-zero token cost.</div></div></div>
+      <div class="uc-item"><div class="uc-icon" style="background:rgba(16,185,129,.1)">&#128202;</div><div><div class="uc-title" style="color:var(--accent4)">Google Search Console</div><div class="uc-text">Pre-built in library already. Track which CMMC queries land on your site.</div></div></div>
+    </div>
+  </div>
+  <div class="reveal" style="margin-top:24px">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:14px">// Pre-Built CLI Library</div>
+    <div class="lib-grid">
+      <div class="lib-item hot"><div class="lib-name">Google Search Console</div><div class="lib-note ac">AskCMMC SEO</div></div>
+      <div class="lib-item"><div class="lib-name">Google Ads</div><div class="lib-note">ad campaigns</div></div>
+      <div class="lib-item hot"><div class="lib-name">trigger.dev</div><div class="lib-note bl">agent scheduling</div></div>
+      <div class="lib-item"><div class="lib-name">Hacker News</div><div class="lib-note">daily intel</div></div>
+      <div class="lib-item"><div class="lib-name">Substack</div><div class="lib-note">newsletter auto</div></div>
+      <div class="lib-item"><div class="lib-name">Google Photos</div><div class="lib-note">media mgmt</div></div>
+      <div class="lib-item" style="border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.02)"><div class="lib-name" style="color:var(--accent)">Build Your Own</div><div class="lib-note bl">any site, ~1hr</div></div>
+    </div>
+  </div>
+  <div class="warn-box reveal">
+    <div style="font-size:18px;flex-shrink:0;margin-top:1px">&#9888;</div>
+    <div><div style="font-size:13px;font-weight:600;color:var(--accent3);margin-bottom:4px">Honest Heads-Up</div><div style="font-size:12px;color:var(--muted2);line-height:1.7">Custom CLIs take about 1 hour of back-and-forth — auth setup, token capture, debugging. Pre-built library installs in 5 minutes. <strong style="color:var(--text)">Start with the library.</strong> Build custom only when a specific tool does not exist yet.</div></div>
+  </div>
+</div>
+</section>
+<div class="divider"></div>
+
+<!-- PRIORITY MATRIX -->
+<section class="sec">
+<div class="wrap">
+  <div class="s-head reveal"><span class="s-num">06</span><div class="s-line"></div><h2 class="s-title">Install Priority</h2></div>
+  <div class="matrix reveal">
+    <div class="mx-cell"><div class="mx-dot md-now"></div><div class="mx-pri pri-now">Install Today</div><div class="mx-repo">Karpathy Guidelines</div><div class="mx-why">One file. Zero downside. Stops rogue refactors immediately.</div></div>
+    <div class="mx-cell"><div class="mx-dot md-now"></div><div class="mx-pri pri-now">Install Today</div><div class="mx-repo">Superpowers</div><div class="mx-why">AskCMMC and Aurora need spec discipline and parallel agents.</div></div>
+    <div class="mx-cell"><div class="mx-dot md-now"></div><div class="mx-pri pri-now">Install Today</div><div class="mx-repo">Open Design</div><div class="mx-why">Scripts, apps, and security tools need to look credible. Design system polish from day one.</div></div>
+    <div class="mx-cell"><div class="mx-dot md-week"></div><div class="mx-pri pri-week">This Week</div><div class="mx-repo">Obsidian Skills</div><div class="mx-why">Wire your notes, threat hunting docs, and architecture context in directly.</div></div>
+    <div class="mx-cell"><div class="mx-dot md-now"></div><div class="mx-pri pri-now">Install Today</div><div class="mx-repo">Everything Claude Code</div><div class="mx-why">CVE scanning on every dependency, prompt injection blocking, token cost cut in half.</div></div>
+    <div class="mx-cell"><div class="mx-dot md-now"></div><div class="mx-pri pri-now">Install Today</div><div class="mx-repo">Roof Flow</div><div class="mx-why">Parallel agents for detection engineering, script writing, and test validation simultaneously.</div></div>
+  </div>
+</div>
+</section>
+<div class="divider"></div>
+
+<!-- DEEPSEEK BONUS -->
+<section class="sec">
+<div class="wrap">
+  <div class="s-head reveal"><span class="s-num">07</span><div class="s-line"></div><h2 class="s-title">DeepSeek Swap</h2></div>
+  <p class="reveal" style="color:var(--muted2);font-size:14px;max-width:640px;line-height:1.7;font-weight:300;margin-bottom:40px">
+    DeepSeek's official repo includes a guide for routing Claude Code at DeepSeek's API. Same tooling, same repos, different model. Use it for cheap batch runs and experiments — keep Claude for production builds where instruction-following precision matters.
+  </p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="reveal">
+    <div style="border:1px solid var(--border);border-radius:8px;padding:28px;background:var(--surface)">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--accent3);text-transform:uppercase;margin-bottom:12px">When to use DeepSeek</div>
+      <div style="font-size:13px;color:var(--muted2);line-height:1.8">
+        <div style="display:flex;gap:10px;margin-bottom:8px"><span style="color:var(--accent4);flex-shrink:0">v</span>Batch script generation runs</div>
+        <div style="display:flex;gap:10px;margin-bottom:8px"><span style="color:var(--accent4);flex-shrink:0">v</span>Experimental or throwaway code</div>
+        <div style="display:flex;gap:10px;margin-bottom:8px"><span style="color:var(--accent4);flex-shrink:0">v</span>High-volume token tasks (log parsing, doc gen)</div>
+        <div style="display:flex;gap:10px"><span style="color:var(--accent4);flex-shrink:0">v</span>Cost benchmarking before switching a workflow</div>
+      </div>
+    </div>
+    <div style="border:1px solid var(--border);border-radius:8px;padding:28px;background:var(--surface)">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:12px">When to keep Claude</div>
+      <div style="font-size:13px;color:var(--muted2);line-height:1.8">
+        <div style="display:flex;gap:10px;margin-bottom:8px"><span style="color:var(--accent);flex-shrink:0">*</span>Multi-step reasoning (Superpowers spec writing)</div>
+        <div style="display:flex;gap:10px;margin-bottom:8px"><span style="color:var(--accent);flex-shrink:0">*</span>Karpathy discipline enforcement</div>
+        <div style="display:flex;gap:10px;margin-bottom:8px"><span style="color:var(--accent);flex-shrink:0">*</span>Security tools where output precision matters</div>
+        <div style="display:flex;gap:10px"><span style="color:var(--accent);flex-shrink:0">*</span>Anything going into a real codebase</div>
+      </div>
+    </div>
+  </div>
+  <div class="code-box reveal" style="margin-top:28px">
+    <div class="code-top"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="code-fn">Route Claude Code to DeepSeek API</span></div>
+    <div class="code-body">
+<span class="cc"># Already configured — ds alias is set up and working</span>
+<span class="cc"># Verify which API you're hitting:</span>
+<span class="ck">echo</span> <span class="cv">$ANTHROPIC_BASE_URL</span>
+<span class="cm"># blank or api.anthropic.com = Claude billing</span>
+<span class="cm"># api.deepseek.com = DeepSeek billing</span>
+
+<span class="cc"># ds is your alias — use it for everything:</span>
+<span class="ck">ds</span>                <span class="cm"># opens Claude Code via DeepSeek API</span>
+<span class="ck">ds</span> --version      <span class="cm"># confirms Claude Code v2.1.148</span>
+    </div>
+  </div>
+  <div style="border:1px solid rgba(244,63,94,.2);border-radius:8px;padding:22px 26px;background:rgba(244,63,94,.03);display:flex;gap:14px;margin-top:20px" class="reveal">
+    <div style="font-size:18px;flex-shrink:0;margin-top:1px">&#9888;</div>
+    <div><div style="font-size:13px;font-weight:600;color:var(--accent3);margin-bottom:4px">Tradeoff to Know</div><div style="font-size:12px;color:var(--muted2);line-height:1.7">DeepSeek V4 is strong on coding tasks but noticeably weaker on nuanced instruction-following — which is exactly what Superpowers and Karpathy are disciplining. Cheaper tokens, more drift. Use it intentionally, not as a default.</div></div>
+  </div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SETUP INSTRUCTIONS -->
+<section class="sec">
+<div class="wrap">
+  <div class="s-head reveal"><span class="s-num">08</span><div class="s-line"></div><h2 class="s-title">Setup Instructions</h2></div>
+  <p class="reveal" style="color:var(--muted2);font-size:14px;max-width:640px;line-height:1.7;font-weight:300;margin-bottom:48px">Full install order. Run these in sequence — each one builds on the last. DeepSeek alias already done, so that step is skipped.</p>
+
+  <!-- Step 1: Claude Code -->
+  <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:16px;background:var(--surface);overflow:hidden" class="reveal">
+    <div style="display:flex;align-items:center;gap:16px;padding:20px 28px;border-bottom:1px solid var(--border);background:var(--surface2)">
+      <div style="width:32px;height:32px;border-radius:6px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0">01</div>
+      <div><div style="font-size:15px;font-weight:700;letter-spacing:-.3px">Claude Code</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px">prerequisite — everything runs on top of this</div></div>
+      <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;padding:4px 10px;border-radius:4px;background:rgba(16,185,129,.08);color:var(--accent4);border:1px solid rgba(16,185,129,.2)">Required First</div>
+    </div>
+    <div class="code-body" style="padding:20px 28px">
+<span class="cc"># Install Node.js 18+ first if not already installed</span>
+<span class="cc"># https://nodejs.org or via nvm:</span>
+<span class="ck">curl</span> -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+<span class="ck">nvm</span> install 18 && nvm use 18
+
+<span class="cc"># Install Claude Code globally</span>
+<span class="ck">npm</span> install -g @anthropic-ai/claude-code
+
+<span class="cc"># Verify install</span>
+<span class="ck">claude</span> --version
+
+<span class="cc"># Login (opens browser for Anthropic auth)</span>
+<span class="ck">claude</span> login
+    </div>
+  </div>
+
+  <!-- Step 2: Karpathy -->
+  <div style="border:1px solid rgba(16,185,129,.25);border-radius:8px;margin-bottom:16px;background:var(--surface);overflow:hidden" class="reveal">
+    <div style="display:flex;align-items:center;gap:16px;padding:20px 28px;border-bottom:1px solid rgba(16,185,129,.15);background:rgba(16,185,129,.03)">
+      <div style="width:32px;height:32px;border-radius:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent4);flex-shrink:0">02</div>
+      <div><div style="font-size:15px;font-weight:700;letter-spacing:-.3px">Karpathy Guidelines</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px">install first, costs nothing, stops rogue refactors immediately</div></div>
+      <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;padding:4px 10px;border-radius:4px;background:rgba(16,185,129,.08);color:var(--accent4);border:1px solid rgba(16,185,129,.2)">Install Today</div>
+    </div>
+    <div class="code-body" style="padding:20px 28px">
+<span class="ck">claude</span> plugin install karpathy-claude-code-guidelines
+
+<span class="cc"># Verify it loaded — you should see it listed</span>
+<span class="ck">claude</span> plugin list
+
+<span class="cc"># That's it. Rules activate automatically on every session.</span>
+<span class="cc"># No config needed. Works via CLAUDE.md injection.</span>
+    </div>
+  </div>
+
+  <!-- Step 3: Superpowers -->
+  <div style="border:1px solid rgba(0,212,255,.25);border-radius:8px;margin-bottom:16px;background:var(--surface);overflow:hidden" class="reveal">
+    <div style="display:flex;align-items:center;gap:16px;padding:20px 28px;border-bottom:1px solid rgba(0,212,255,.12);background:rgba(0,212,255,.02)">
+      <div style="width:32px;height:32px;border-radius:6px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0">03</div>
+      <div><div style="font-size:15px;font-weight:700;letter-spacing:-.3px">Superpowers</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px">spec discipline + parallel agents — auto-activates</div></div>
+      <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;padding:4px 10px;border-radius:4px;background:rgba(0,212,255,.08);color:var(--accent);border:1px solid rgba(0,212,255,.18)">Install Today</div>
+    </div>
+    <div class="code-body" style="padding:20px 28px">
+<span class="ck">claude</span> plugin install superpowers
+
+<span class="cc"># Auto-triggers on install. To confirm it's active:</span>
+<span class="ck">claude</span> plugin list
+
+<span class="cc"># First time you open a project Claude will ask you to</span>
+<span class="cc"># confirm a spec before writing code. That's it working.</span>
+    </div>
+  </div>
+
+  <!-- Step 4: Open Design -->
+  <div style="border:1px solid rgba(124,58,237,.25);border-radius:8px;margin-bottom:16px;background:var(--surface);overflow:hidden" class="reveal">
+    <div style="display:flex;align-items:center;gap:16px;padding:20px 28px;border-bottom:1px solid rgba(124,58,237,.15);background:rgba(124,58,237,.02)">
+      <div style="width:32px;height:32px;border-radius:6px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#a78bfa;flex-shrink:0">04</div>
+      <div><div style="font-size:15px;font-weight:700;letter-spacing:-.3px">Open Design</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px">clone repo, point claude at a design system by name</div></div>
+      <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;padding:4px 10px;border-radius:4px;background:rgba(124,58,237,.08);color:#a78bfa;border:1px solid rgba(124,58,237,.2)">Install Today</div>
+    </div>
+    <div class="code-body" style="padding:20px 28px">
+<span class="cc"># Clone the repo somewhere permanent on your machine</span>
+<span class="ck">git</span> clone https://github.com/nexu-io/open-design ~/tools/open-design
+<span class="ck">cd</span> ~/tools/open-design
+
+<span class="cc"># Add it to your CLAUDE.md so every project can reference it</span>
+<span class="cc"># In your project CLAUDE.md add:</span>
+<span class="cs">DESIGN_SYSTEM_PATH: ~/tools/open-design</span>
+<span class="cs">DESIGN_REFERENCE: Linear  # or Stripe, Airbnb, Notion, Apple</span>
+
+<span class="cc"># Then in Claude Code just say:</span>
+<span class="cc"># "Refine this UI to Linear-level polish"</span>
+<span class="cc"># "Style this form using the Stripe design system"</span>
+    </div>
+  </div>
+
+  <!-- Step 5: Everything Claude Code -->
+  <div style="border:1px solid rgba(244,63,94,.2);border-radius:8px;margin-bottom:16px;background:var(--surface);overflow:hidden" class="reveal">
+    <div style="display:flex;align-items:center;gap:16px;padding:20px 28px;border-bottom:1px solid rgba(244,63,94,.12);background:rgba(244,63,94,.02)">
+      <div style="width:32px;height:32px;border-radius:6px;background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.2);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent3);flex-shrink:0">05</div>
+      <div><div style="font-size:15px;font-weight:700;letter-spacing:-.3px">Everything Claude Code</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px">install all, configure only CVE + injection + token opts</div></div>
+      <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;padding:4px 10px;border-radius:4px;background:rgba(16,185,129,.08);color:var(--accent4);border:1px solid rgba(16,185,129,.2)">Install Today</div>
+    </div>
+    <div class="code-body" style="padding:20px 28px">
+<span class="ck">claude</span> plugin install everything-claude-code
+
+<span class="cc"># The 3 features worth enabling explicitly:</span>
+
+<span class="cc"># 1. CVE scanning — checks every new dependency</span>
+<span class="ck">claude</span> config set security.cve_scan true
+
+<span class="cc"># 2. Prompt injection blocking</span>
+<span class="ck">claude</span> config set security.injection_guard true
+
+<span class="cc"># 3. Token optimization (cuts context cost ~50%)</span>
+<span class="ck">claude</span> config set tokens.optimize true
+
+<span class="cc"># Ignore the 182 skills — they load on-demand, won't slow you down</span>
+    </div>
+  </div>
+
+  <!-- Step 6: Obsidian Skills -->
+  <div style="border:1px solid rgba(124,58,237,.2);border-radius:8px;margin-bottom:16px;background:var(--surface);overflow:hidden" class="reveal">
+    <div style="display:flex;align-items:center;gap:16px;padding:20px 28px;border-bottom:1px solid rgba(124,58,237,.12);background:rgba(124,58,237,.02)">
+      <div style="width:32px;height:32px;border-radius:6px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#a78bfa;flex-shrink:0">06</div>
+      <div><div style="font-size:15px;font-weight:700;letter-spacing:-.3px">Obsidian Skills</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px">point it at your vault path — context loads automatically</div></div>
+      <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;padding:4px 10px;border-radius:4px;background:rgba(0,212,255,.08);color:var(--accent);border:1px solid rgba(0,212,255,.18)">This Week</div>
+    </div>
+    <div class="code-body" style="padding:20px 28px">
+<span class="ck">claude</span> plugin install obsidian-skills
+
+<span class="cc"># Point it at your vault(s) — add to CLAUDE.md:</span>
+<span class="cs">OBSIDIAN_VAULT:</span>
+  <span class="cv">- ~/vault/CMMC</span>
+  <span class="cv">- ~/vault/RedSun</span>
+  <span class="cv">- ~/vault/Aurora</span>
+
+<span class="cc"># Claude will now auto-pull relevant notes as context.</span>
+<span class="cc"># You can also reference directly:</span>
+<span class="cc"># "See my note on [[AC-3 Access Enforcement]]"</span>
+    </div>
+  </div>
+
+  <!-- Step 7: Roof Flow -->
+  <div style="border:1px solid rgba(0,212,255,.2);border-radius:8px;margin-bottom:16px;background:var(--surface);overflow:hidden" class="reveal">
+    <div style="display:flex;align-items:center;gap:16px;padding:20px 28px;border-bottom:1px solid rgba(0,212,255,.1);background:rgba(0,212,255,.02)">
+      <div style="width:32px;height:32px;border-radius:6px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0">07</div>
+      <div><div style="font-size:15px;font-weight:700;letter-spacing:-.3px">Roof Flow</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px">swarm orchestration — parallel agents on complex builds</div></div>
+      <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;padding:4px 10px;border-radius:4px;background:rgba(16,185,129,.08);color:var(--accent4);border:1px solid rgba(16,185,129,.2)">Install Today</div>
+    </div>
+    <div class="code-body" style="padding:20px 28px">
+<span class="ck">claude</span> plugin install roof-flow
+
+<span class="cc"># Define a swarm task — example for a cybersecurity script:</span>
+<span class="cs">// .claude/swarm.json</span>
+<span class="cv">{</span>
+  <span class="ck">"agents"</span>: [
+    { <span class="ck">"role"</span>: <span class="cs">"researcher"</span>, <span class="ck">"task"</span>: <span class="cs">"map MITRE technique to detection logic"</span> },
+    { <span class="ck">"role"</span>: <span class="cs">"writer"</span>,     <span class="ck">"task"</span>: <span class="cs">"write SPL/KQL detection query"</span> },
+    { <span class="ck">"role"</span>: <span class="cs">"reviewer"</span>,   <span class="ck">"task"</span>: <span class="cs">"validate query against log samples"</span> }
+  ],
+  <span class="ck">"shared_memory"</span>: true
+<span class="cv">}</span>
+
+<span class="cc"># Trigger it:</span>
+<span class="ck">claude</span> swarm run .claude/swarm.json
+    </div>
+  </div>
+
+  <!-- Step 8: Printing Press -->
+  <div style="border:1px solid rgba(16,185,129,.2);border-radius:8px;margin-bottom:16px;background:var(--surface);overflow:hidden" class="reveal">
+    <div style="display:flex;align-items:center;gap:16px;padding:20px 28px;border-bottom:1px solid rgba(16,185,129,.1);background:rgba(16,185,129,.02)">
+      <div style="width:32px;height:32px;border-radius:6px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent4);flex-shrink:0">08</div>
+      <div><div style="font-size:15px;font-weight:700;letter-spacing:-.3px">Printing Press</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px">CLI connectors — requires Go installed first</div></div>
+      <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;padding:4px 10px;border-radius:4px;background:rgba(16,185,129,.08);color:var(--accent4);border:1px solid rgba(16,185,129,.2)">Install Today</div>
+    </div>
+    <div class="code-body" style="padding:20px 28px">
+<span class="cc"># Step 1 — Install Go (if not already installed)</span>
+<span class="cc"># Download from https://go.dev/dl/ or:</span>
+<span class="ck">brew</span> install go           <span class="cc"># macOS</span>
+<span class="ck">sudo apt install golang</span>   <span class="cc"># Ubuntu/Debian (Alienware runs this)</span>
+
+<span class="cc"># Verify Go</span>
+<span class="ck">go</span> version
+
+<span class="cc"># Step 2 — Clone Printing Press</span>
+<span class="ck">git</span> clone https://github.com/nate-hurt/printing-press ~/tools/printing-press
+<span class="ck">cd</span> ~/tools/printing-press
+
+<span class="cc"># Step 3 — Build and install</span>
+<span class="ck">go</span> build -o printing-press .
+<span class="ck">sudo</span> mv printing-press /usr/local/bin/
+
+<span class="cc"># Step 4 — Install a pre-built CLI (e.g. Google Search Console)</span>
+<span class="ck">printing-press</span> install google-search-console
+<span class="ck">printing-press</span> install trigger-dev
+
+<span class="cc"># Step 5 — Install the Factory skill (lets ds build new CLIs on demand)</span>
+<span class="ck">npx</span> skills add mvanhorn/cli-printing-press/skills -g -a claude-code -y
+
+<span class="cc"># Step 6 — Auth setup for pre-built CLIs (one time per CLI)</span>
+<span class="ck">printing-press</span> auth google-search-console
+    </div>
+  </div>
+
+  <!-- Step 9: CLAUDE.md -->
+  <div style="border:1px solid var(--border2);border-radius:8px;margin-bottom:16px;background:var(--surface);overflow:hidden" class="reveal">
+    <div style="display:flex;align-items:center;gap:16px;padding:20px 28px;border-bottom:1px solid var(--border);background:var(--surface2)">
+      <div style="width:32px;height:32px;border-radius:6px;background:rgba(255,255,255,.04);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--text);flex-shrink:0">09</div>
+      <div><div style="font-size:15px;font-weight:700;letter-spacing:-.3px">Wire It All Together — CLAUDE.md</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px">drop in project root — every plugin reads this automatically</div></div>
+      <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;padding:4px 10px;border-radius:4px;background:rgba(255,255,255,.04);color:var(--muted2);border:1px solid var(--border2)">Final Step</div>
+    </div>
+    <div class="code-body" style="padding:20px 28px">
+<span class="cc"># Drop this at your project root as CLAUDE.md</span>
+<span class="cc"># Every plugin reads it. This is your single source of truth.</span>
+
+<span class="cs"># KARPATHY</span>
+<span class="ck">BEFORE_CODE:</span>
+  <span class="cv">- Write success criteria first</span>
+  <span class="cw">  NEVER refactor files not in the task</span>
+
+<span class="cs"># SUPERPOWERS</span>
+<span class="ck">PLANNING:</span>
+  <span class="cv">- Spec file required before feature builds</span>
+  <span class="cv">- Parallel agents for independent layers</span>
+
+<span class="cs"># OPEN DESIGN</span>
+<span class="ck">DESIGN_SYSTEM_PATH:</span> <span class="cv">~/tools/open-design</span>
+<span class="ck">DESIGN_REFERENCE:</span>   <span class="cv">Linear</span>
+
+<span class="cs"># OBSIDIAN</span>
+<span class="ck">OBSIDIAN_VAULT:</span>
+  <span class="cv">- ~/vault/CMMC</span>
+  <span class="cv">- ~/vault/RedSun</span>
+
+<span class="cs"># SECURITY (Everything CC)</span>
+<span class="ck">SECURITY:</span>
+  <span class="cv">- CVE scan all new dependencies</span>
+  <span class="cw">  NEVER bypass injection checks</span>
+
+<span class="cs"># DEEPSEEK (already configured via ds alias)</span>
+<span class="ck">ALIASES:</span>
+  <span class="cv">- ds  = DeepSeek API (batch / experiments)</span>
+  <span class="cv">- claude = Anthropic API (production builds)</span>
+
+<span class="cs"># NEVER DO</span>
+<span class="cw">FORBIDDEN:</span>
+  <span class="cw">- Rename files unprompted</span>
+  <span class="cw">- Restructure folders without instruction</span>
+    </div>
+  </div>
+
+  <!-- Verify all -->
+  <div style="border:1px solid rgba(16,185,129,.25);border-radius:8px;background:rgba(16,185,129,.04);padding:28px" class="reveal">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--accent4);text-transform:uppercase;margin-bottom:16px">// Verify Everything is Running</div>
+    <div class="code-body" style="padding:0">
+<span class="ck">claude</span> plugin list
+<span class="cc"># Should show: karpathy-claude-code-guidelines, superpowers,</span>
+<span class="cc"># everything-claude-code, obsidian-skills, roof-flow</span>
+
+<span class="ck">claude</span> --version    <span class="cc"># confirms base install</span>
+<span class="ck">go</span> version          <span class="cc"># confirms Go for Printing Press</span>
+<span class="ck">printing-press</span> list <span class="cc"># shows installed CLIs</span>
+<span class="ck">ds</span> --version        <span class="cc"># confirms DeepSeek alias works (already done)</span>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- USAGE INSTRUCTIONS -->
+<section class="sec">
+<div class="wrap">
+  <div class="s-head reveal"><span class="s-num">09</span><div class="s-line"></div><h2 class="s-title">How to Use Each Tool</h2></div>
+  <p class="reveal" style="color:var(--muted2);font-size:14px;max-width:640px;line-height:1.7;font-weight:300;margin-bottom:48px">Detailed usage patterns for every tool in your stack. Not theory — exact commands, prompts, and workflows.</p>
+
+  <!-- KARPATHY -->
+  <div style="border:1px solid rgba(16,185,129,.25);border-radius:8px;margin-bottom:24px;overflow:hidden" class="reveal">
+    <div style="padding:24px 32px;background:rgba(16,185,129,.03);border-bottom:1px solid rgba(16,185,129,.12);display:flex;align-items:center;gap:14px">
+      <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#128215;</div>
+      <div>
+        <div style="font-size:18px;font-weight:700;letter-spacing:-.3px">Karpathy Guidelines</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(16,185,129,.7);letter-spacing:2px;text-transform:uppercase;margin-top:3px">passive — works automatically, nothing to activate</div>
+      </div>
+    </div>
+    <div style="padding:28px 32px">
+      <p style="font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:20px">Karpathy is invisible — it runs on every session automatically. You don't call it. Instead, understand what it enforces so you can work with it rather than fight it.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:18px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--accent4);text-transform:uppercase;margin-bottom:12px">4 Rules It Enforces</div>
+          <div style="font-size:12px;color:var(--muted2);line-height:1.9">
+            <div style="margin-bottom:6px"><span style="color:var(--accent4)">1.</span> Think before coding — plan first</div>
+            <div style="margin-bottom:6px"><span style="color:var(--accent4)">2.</span> Build simplest thing that works</div>
+            <div style="margin-bottom:6px"><span style="color:var(--accent4)">3.</span> Surgical changes only</div>
+            <div><span style="color:var(--accent4)">4.</span> Don't improve what wasn't asked</div>
+          </div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:18px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--accent3);text-transform:uppercase;margin-bottom:12px">What It Prevents</div>
+          <div style="font-size:12px;color:var(--muted2);line-height:1.9">
+            <div style="margin-bottom:6px"><span style="color:var(--accent3)">x</span> Refactoring files you didn't mention</div>
+            <div style="margin-bottom:6px"><span style="color:var(--accent3)">x</span> Adding features nobody asked for</div>
+            <div style="margin-bottom:6px"><span style="color:var(--accent3)">x</span> Over-engineering simple tasks</div>
+            <div><span style="color:var(--accent3)">x</span> Infinite loops with no exit criteria</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:12px">// How to Work With It</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:14px 18px">
+          <div style="font-size:11px;font-weight:600;color:var(--accent4);margin-bottom:4px">Be specific about scope</div>
+          <div style="font-size:12px;color:var(--muted2)">"Fix the login bug in auth.js — don't touch anything else" — tells it exactly where surgical changes apply</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:14px 18px">
+          <div style="font-size:11px;font-weight:600;color:var(--accent4);margin-bottom:4px">Define done explicitly</div>
+          <div style="font-size:12px;color:var(--muted2)">"Done = user can log in without 401 error. Stop after that." — Karpathy enforces this, Claude won't keep going</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:14px 18px">
+          <div style="font-size:11px;font-weight:600;color:var(--accent4);margin-bottom:4px">For cybersecurity scripts</div>
+          <div style="font-size:12px;color:var(--muted2)">"Write a bash script to detect failed SSH logins. Only create detection.sh — don't modify any existing files."</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:14px 18px">
+          <div style="font-size:11px;font-weight:600;color:var(--accent3);margin-bottom:4px">If it feels too restrictive</div>
+          <div style="font-size:12px;color:var(--muted2)">Explicitly tell it to refactor: "Refactor the entire auth module — this is intentional, not a bug fix." It'll comply when you're clear.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPERPOWERS -->
+  <div style="border:1px solid rgba(0,212,255,.25);border-radius:8px;margin-bottom:24px;overflow:hidden" class="reveal">
+    <div style="padding:24px 32px;background:rgba(0,212,255,.02);border-bottom:1px solid rgba(0,212,255,.1);display:flex;align-items:center;gap:14px">
+      <div style="width:36px;height:36px;border-radius:8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#9889;</div>
+      <div>
+        <div style="font-size:18px;font-weight:700;letter-spacing:-.3px">Superpowers</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(0,212,255,.7);letter-spacing:2px;text-transform:uppercase;margin-top:3px">3 slash commands — brainstorm, plan, execute</div>
+      </div>
+    </div>
+    <div style="padding:28px 32px">
+      <p style="font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:24px">Superpowers turns Claude Code into a disciplined senior engineer. The workflow is always the same: brainstorm first, write a spec, then execute. Never skip to execute.</p>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px">// The 3-Step Workflow</div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
+        <div style="background:var(--surface2);border:1px solid rgba(0,212,255,.15);border-radius:6px;padding:18px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;background:rgba(0,212,255,.1);color:var(--accent);padding:3px 8px;border-radius:3px">/superpowers:brainstorm</div>
+            <div style="font-size:11px;color:var(--muted)">Step 1</div>
+          </div>
+          <div style="font-size:12px;color:var(--muted2);line-height:1.7">Explores approaches, surfaces edge cases, asks clarifying questions. Use this before you know exactly what you want built. Example: <span style="color:var(--text)">/superpowers:brainstorm build a CVE monitoring script that alerts on critical vulns</span></div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid rgba(0,212,255,.15);border-radius:6px;padding:18px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;background:rgba(0,212,255,.1);color:var(--accent);padding:3px 8px;border-radius:3px">/superpowers:write-plan</div>
+            <div style="font-size:11px;color:var(--muted)">Step 2</div>
+          </div>
+          <div style="font-size:12px;color:var(--muted2);line-height:1.7">Writes a full spec file before touching any code. Defines files to create, functions to write, success criteria, edge cases. Review this before saying yes — this is your last cheap checkpoint.</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid rgba(16,185,129,.15);border-radius:6px;padding:18px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;background:rgba(16,185,129,.1);color:var(--accent4);padding:3px 8px;border-radius:3px">/superpowers:execute-plan</div>
+            <div style="font-size:11px;color:var(--muted)">Step 3</div>
+          </div>
+          <div style="font-size:12px;color:var(--muted2);line-height:1.7">Executes the approved spec. Dispatches parallel sub-agents if tasks are independent. Runs tests. Self-reviews. Only run this after you've approved the plan.</div>
+        </div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px">// Real Examples for Your Workflow</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:16px">
+          <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:6px">Building a detection script</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted2);line-height:1.8">/superpowers:brainstorm SSH brute force detector<br>/superpowers:write-plan<br>// review spec<br>/superpowers:execute-plan</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:16px">
+          <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:6px">Building a full app feature</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted2);line-height:1.8">/superpowers:brainstorm user auth system<br>/superpowers:write-plan<br>// edit spec if needed<br>/superpowers:execute-plan</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPEN DESIGN -->
+  <div style="border:1px solid rgba(124,58,237,.25);border-radius:8px;margin-bottom:24px;overflow:hidden" class="reveal">
+    <div style="padding:24px 32px;background:rgba(124,58,237,.02);border-bottom:1px solid rgba(124,58,237,.1);display:flex;align-items:center;gap:14px">
+      <div style="width:36px;height:36px;border-radius:8px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#127912;</div>
+      <div>
+        <div style="font-size:18px;font-weight:700;letter-spacing:-.3px">Open Design</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(167,139,250,.7);letter-spacing:2px;text-transform:uppercase;margin-top:3px">reference by name in any ds session</div>
+      </div>
+    </div>
+    <div style="padding:28px 32px">
+      <p style="font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:24px">You don't call Open Design with a command. You reference a design system by name in your prompt and <code style="background:var(--surface2);padding:2px 6px;border-radius:3px;font-size:11px">ds</code> pulls from <code style="background:var(--surface2);padding:2px 6px;border-radius:3px;font-size:11px">~/tools/open-design</code> automatically via your CLAUDE.md.</p>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px">// Prompts That Work</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+        <div style="background:var(--surface2);border:1px solid rgba(124,58,237,.15);border-radius:6px;padding:14px 18px">
+          <div style="font-size:11px;font-weight:600;color:#a78bfa;margin-bottom:4px">Polish existing UI</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2)">"Refine this dashboard to Linear-level polish. Reference the Linear design system."</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid rgba(124,58,237,.15);border-radius:6px;padding:14px 18px">
+          <div style="font-size:11px;font-weight:600;color:#a78bfa;margin-bottom:4px">Build a new component</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2)">"Build a login form using Stripe's design patterns — clean, minimal, high trust."</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid rgba(124,58,237,.15);border-radius:6px;padding:14px 18px">
+          <div style="font-size:11px;font-weight:600;color:#a78bfa;margin-bottom:4px">Self-critique loop</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2)">"Review this UI against the Airbnb design system. Score it on all 5 dimensions and fix the lowest scoring one."</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid rgba(124,58,237,.15);border-radius:6px;padding:14px 18px">
+          <div style="font-size:11px;font-weight:600;color:#a78bfa;margin-bottom:4px">Dark theme cybersecurity tool</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2)">"Style this SOC dashboard using Linear's dark theme tokens. Terminal aesthetic, high information density."</div>
+        </div>
+      </div>
+      <div style="background:rgba(124,58,237,.05);border:1px solid rgba(124,58,237,.15);border-radius:6px;padding:16px">
+        <div style="font-size:11px;font-weight:600;color:#a78bfa;margin-bottom:6px">72 available design systems</div>
+        <div style="font-size:12px;color:var(--muted2);line-height:1.7">Linear, Stripe, Airbnb, Notion, Apple, Vercel, Figma, GitHub, Atlassian, and 63 more. Reference any by name. Best ones for your work: <span style="color:var(--text)">Linear</span> (dashboards), <span style="color:var(--text)">Stripe</span> (forms + trust), <span style="color:var(--text)">Vercel</span> (dark dev tools), <span style="color:var(--text)">GitHub</span> (code-adjacent UI).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ECC -->
+  <div style="border:1px solid rgba(244,63,94,.2);border-radius:8px;margin-bottom:24px;overflow:hidden" class="reveal">
+    <div style="padding:24px 32px;background:rgba(244,63,94,.02);border-bottom:1px solid rgba(244,63,94,.1);display:flex;align-items:center;gap:14px">
+      <div style="width:36px;height:36px;border-radius:8px;background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#128737;</div>
+      <div>
+        <div style="font-size:18px;font-weight:700;letter-spacing:-.3px">Everything Claude Code (ECC)</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(244,63,94,.7);letter-spacing:2px;text-transform:uppercase;margin-top:3px">use 3 features — ignore the rest</div>
+      </div>
+    </div>
+    <div style="padding:28px 32px">
+      <p style="font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:24px">ECC has 182 skills. You need 3. The rest are noise for your workflow. Focus exclusively on CVE scanning, injection blocking, and token optimization.</p>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="background:var(--surface2);border:1px solid rgba(244,63,94,.15);border-radius:6px;padding:20px">
+          <div style="font-size:13px;font-weight:700;color:var(--accent3);margin-bottom:8px">1. CVE Scanning</div>
+          <div style="font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:12px">Automatically checks every new dependency you add for known vulnerabilities. Runs silently in the background — you only hear about it when something is flagged.</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent4);background:var(--surface);padding:10px 14px;border-radius:4px"># Trigger manually on demand:<br>"Scan all dependencies in this project for CVEs"<br><br># Or let it run automatically on every npm/pip install</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid rgba(244,63,94,.15);border-radius:6px;padding:20px">
+          <div style="font-size:13px;font-weight:700;color:var(--accent3);margin-bottom:8px">2. Prompt Injection Blocking</div>
+          <div style="font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:12px">Intercepts malicious strings in user input before they reach the model. Critical any time your app takes external input and passes it to an AI. Runs automatically — no prompt needed.</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent4);background:var(--surface);padding:10px 14px;border-radius:4px"># Test it manually:<br>"Check this user input for prompt injection: [paste suspicious string]"</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid rgba(244,63,94,.15);border-radius:6px;padding:20px">
+          <div style="font-size:13px;font-weight:700;color:var(--accent3);margin-bottom:8px">3. Token Optimization</div>
+          <div style="font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:12px">Compresses context before sending to the model. On large codebases this cuts your token bill roughly in half. Runs automatically once enabled via config.</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent4);background:var(--surface);padding:10px 14px;border-radius:4px"># Already enabled if you ran:<br>ds config set tokens.optimize true</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RUFLO -->
+  <div style="border:1px solid rgba(0,212,255,.2);border-radius:8px;margin-bottom:24px;overflow:hidden" class="reveal">
+    <div style="padding:24px 32px;background:rgba(0,212,255,.02);border-bottom:1px solid rgba(0,212,255,.1);display:flex;align-items:center;gap:14px">
+      <div style="width:36px;height:36px;border-radius:8px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#127960;</div>
+      <div>
+        <div style="font-size:18px;font-weight:700;letter-spacing:-.3px">Ruflo</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(0,212,255,.7);letter-spacing:2px;text-transform:uppercase;margin-top:3px">when one claude isn't enough — run a hundred</div>
+      </div>
+    </div>
+    <div style="padding:28px 32px">
+      <p style="font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:24px">Ruflo runs multiple Claude agents in parallel, each with a specific role, sharing memory. Instead of one agent doing everything sequentially, you get a development team.</p>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px">// How to Define a Swarm</div>
+      <div class="code-body" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:18px;margin-bottom:20px;font-size:11px">
+<span class="cc"># Create .claude/swarm.json in your project</span>
+<span class="cv">{</span>
+  <span class="ck">"agents"</span>: [
+    { <span class="ck">"role"</span>: <span class="cs">"researcher"</span>, <span class="ck">"task"</span>: <span class="cs">"your research task here"</span> },
+    { <span class="ck">"role"</span>: <span class="cs">"writer"</span>,     <span class="ck">"task"</span>: <span class="cs">"your build task here"</span> },
+    { <span class="ck">"role"</span>: <span class="cs">"reviewer"</span>,   <span class="ck">"task"</span>: <span class="cs">"your review task here"</span> }
+  ],
+  <span class="ck">"shared_memory"</span>: true
+<span class="cv">}</span>
+
+<span class="cc"># Run it:</span>
+<span class="ck">ds</span> swarm run .claude/swarm.json
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px">// Real Swarm Configs for Your Work</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:18px">
+          <div style="font-size:12px;font-weight:600;color:var(--accent);margin-bottom:10px">Detection Engineering Swarm</div>
+          <div class="code-body" style="padding:0;font-size:10px">
+<span class="cv">{</span> <span class="ck">"agents"</span>: [
+  { <span class="ck">"role"</span>: <span class="cs">"researcher"</span>, <span class="ck">"task"</span>: <span class="cs">"map MITRE T1059.001 to detection opportunities"</span> },
+  { <span class="ck">"role"</span>: <span class="cs">"writer"</span>,     <span class="ck">"task"</span>: <span class="cs">"write SPL detection query for PowerShell abuse"</span> },
+  { <span class="ck">"role"</span>: <span class="cs">"tester"</span>,     <span class="ck">"task"</span>: <span class="cs">"validate query against sample log data in /logs"</span> }
+], <span class="ck">"shared_memory"</span>: true <span class="cv">}</span>
+          </div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:18px">
+          <div style="font-size:12px;font-weight:600;color:var(--accent);margin-bottom:10px">Full App Feature Swarm</div>
+          <div class="code-body" style="padding:0;font-size:10px">
+<span class="cv">{</span> <span class="ck">"agents"</span>: [
+  { <span class="ck">"role"</span>: <span class="cs">"backend"</span>,  <span class="ck">"task"</span>: <span class="cs">"build the API endpoint and DB schema"</span> },
+  { <span class="ck">"role"</span>: <span class="cs">"frontend"</span>, <span class="ck">"task"</span>: <span class="cs">"build the UI component for this feature"</span> },
+  { <span class="ck">"role"</span>: <span class="cs">"tests"</span>,    <span class="ck">"task"</span>: <span class="cs">"write unit and integration tests for both"</span> }
+], <span class="ck">"shared_memory"</span>: true <span class="cv">}</span>
+          </div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:18px">
+          <div style="font-size:12px;font-weight:600;color:var(--accent);margin-bottom:10px">Security Audit Swarm</div>
+          <div class="code-body" style="padding:0;font-size:10px">
+<span class="cv">{</span> <span class="ck">"agents"</span>: [
+  { <span class="ck">"role"</span>: <span class="cs">"scanner"</span>,  <span class="ck">"task"</span>: <span class="cs">"scan all files for hardcoded secrets and CVEs"</span> },
+  { <span class="ck">"role"</span>: <span class="cs">"reviewer"</span>, <span class="ck">"task"</span>: <span class="cs">"review auth logic for injection vulnerabilities"</span> },
+  { <span class="ck">"role"</span>: <span class="cs">"reporter"</span>, <span class="ck">"task"</span>: <span class="cs">"compile findings into a structured report"</span> }
+], <span class="ck">"shared_memory"</span>: true <span class="cv">}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRINTING PRESS -->
+  <div style="border:1px solid rgba(16,185,129,.2);border-radius:8px;margin-bottom:24px;overflow:hidden" class="reveal">
+    <div style="padding:24px 32px;background:rgba(16,185,129,.02);border-bottom:1px solid rgba(16,185,129,.1);display:flex;align-items:center;gap:14px">
+      <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#128424;</div>
+      <div>
+        <div style="font-size:18px;font-weight:700;letter-spacing:-.3px">Printing Press + CLIs</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(16,185,129,.7);letter-spacing:2px;text-transform:uppercase;margin-top:3px">install pre-built or build your own in 10 min</div>
+      </div>
+    </div>
+    <div style="padding:28px 32px">
+      <p style="font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:24px">Printing Press turns any website into a CLI your agent can call with one command. ~5 tokens per call vs 35+ for MCP. Build once, use forever.</p>
+
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px">// Using Pre-Built CLIs</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+        <div style="background:var(--surface2);border:1px solid rgba(16,185,129,.15);border-radius:6px;padding:16px 18px">
+          <div style="font-size:11px;font-weight:600;color:var(--accent4);margin-bottom:6px">Install and use NVD (CVE feed)</div>
+          <div class="code-body" style="padding:0;font-size:10px">
+<span class="ck">npx</span> -y @mvanhorn/printing-press-library install nvd
+<span class="cc"># Then inside ds:</span>
+<span class="cc"># "What critical CVEs dropped in the last 48 hours for Linux?"</span>
+          </div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid rgba(16,185,129,.15);border-radius:6px;padding:16px 18px">
+          <div style="font-size:11px;font-weight:600;color:var(--accent4);margin-bottom:6px">Install and use LinkedIn scraper</div>
+          <div class="code-body" style="padding:0;font-size:10px">
+<span class="ck">npx</span> -y @mvanhorn/printing-press-library install scrape-creators
+<span class="cc"># Then inside ds:</span>
+<span class="cc"># "Find security analyst hiring managers at Verizon on LinkedIn"</span>
+          </div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid rgba(16,185,129,.15);border-radius:6px;padding:16px 18px">
+          <div style="font-size:11px;font-weight:600;color:var(--accent4);margin-bottom:6px">Install and use Hacker News</div>
+          <div class="code-body" style="padding:0;font-size:10px">
+<span class="ck">npx</span> -y @mvanhorn/printing-press-library install hackernews
+<span class="cc"># Then inside ds:</span>
+<span class="cc"># "What are the top cybersecurity stories on HN today?"</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px">// Building a Custom CLI (10 min)</div>
+      <div class="code-body" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:18px;margin-bottom:16px;font-size:11px">
+<span class="cc"># Build a CLI for any site — example: CISA advisories</span>
+<span class="ck">cli-printing-press</span> build --url https://www.cisa.gov/news-events/cybersecurity-advisories --name cisa-advisories
+
+<span class="cc"># Build for a job board with no API</span>
+<span class="ck">cli-printing-press</span> build --url https://www.dice.com/jobs --name dice-jobs
+
+<span class="cc"># Verify it works</span>
+<span class="ck">cisa-advisories</span> --help
+      </div>
+
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px">// Let ds Build It For You (Easiest)</div>
+      <div style="background:var(--surface2);border:1px solid rgba(16,185,129,.15);border-radius:6px;padding:16px 18px">
+        <div style="font-size:12px;color:var(--muted2);line-height:1.7">Open <code style="background:var(--surface);padding:2px 5px;border-radius:3px;font-size:10px">ds</code> and say:<br><br>
+        <span style="color:var(--text);font-style:italic">"Read printingpress.dev and build me a CLI for [site]. I want to be able to ask you [specific question] from the terminal."</span><br><br>
+        ds handles the entire build process — auth, endpoints, binary generation, skill install.</div>
+      </div>
+
+      <div style="margin-top:20px;background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.15);border-radius:6px;padding:16px 18px">
+        <div style="font-size:11px;font-weight:600;color:var(--accent4);margin-bottom:8px">Job hunting automation example</div>
+        <div style="font-size:12px;color:var(--muted2);line-height:1.8">
+          1. Install scrape-creators (LinkedIn)<br>
+          2. Build CLIs for Verizon, Nightwing, Hexcel careers pages<br>
+          3. Open ds every morning and ask:<br>
+          <span style="color:var(--text);font-family:'JetBrains Mono',monospace;font-size:10px">"Check all my target company career pages and LinkedIn for new security roles in the last 24 hours. Match against my resume in ~/vault/Job Search and rank the top 3."</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMBO WORKFLOWS -->
+  <div style="border:1px solid var(--border2);border-radius:8px;overflow:hidden" class="reveal">
+    <div style="padding:24px 32px;background:var(--surface2);border-bottom:1px solid var(--border)">
+      <div style="font-size:18px;font-weight:700;letter-spacing:-.3px">Combining All 6 Together</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:3px">the full stack in action</div>
+    </div>
+    <div style="padding:28px 32px">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:20px">
+          <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:10px">Building a cybersecurity detection tool</div>
+          <div style="font-size:12px;color:var(--muted2);line-height:1.9">
+            <span style="color:var(--accent4)">Printing Press</span> pulls fresh CVE data from NVD<br>
+            <span style="color:var(--accent4)">Karpathy</span> enforces surgical changes as you iterate<br>
+            <span style="color:var(--accent)">Superpowers</span> writes the spec before any code is touched<br>
+            <span style="color:#a78bfa">Ruflo</span> runs researcher + writer + tester agents in parallel<br>
+            <span style="color:var(--accent3)">ECC</span> scans every dependency and blocks injection attempts<br>
+            <span style="color:#a78bfa">Open Design</span> polishes the output dashboard to Vercel-level standard
+          </div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:20px">
+          <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:10px">Morning workflow</div>
+          <div style="font-size:12px;color:var(--muted2);line-height:1.9">
+            Open <code style="background:var(--surface);padding:1px 5px;border-radius:3px;font-size:10px">ds</code> → <span style="color:var(--accent4)">Obsidian Skills</span> auto-loads your daily log and project context<br>
+            Ask: <span style="color:var(--text);font-style:italic">"What new CVEs are relevant to my current project stack?"</span> → <span style="color:var(--accent4)">NVD CLI</span> answers in 5 tokens<br>
+            Ask: <span style="color:var(--text);font-style:italic">"Any new security roles at my target companies?"</span> → <span style="color:var(--accent4)">scrape-creators CLI</span> checks LinkedIn<br>
+            Start building → <span style="color:var(--accent)">Superpowers</span> forces a spec → <span style="color:#a78bfa">Ruflo</span> parallelizes the work → <span style="color:var(--accent3)">ECC</span> watches for vulns
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<div class="divider"></div>
+
+<footer style="position:relative;z-index:1">
+<div class="wrap">
+  <div class="footer">
+    <div class="footer-l"><div>// claude code enhancement stack</div><div style="margin-top:4px;color:var(--muted)">built for Nova — SOC Analyst · AskCMMC.ai</div></div>
+    <div class="footer-r"><div class="fa">6 repos + CLI connectors</div><div style="margin-top:4px">1 ecosystem</div></div>
+  </div>
+</div>
+</footer>
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }});
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
