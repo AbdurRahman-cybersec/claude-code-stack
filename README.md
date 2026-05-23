@@ -1,8 +1,4 @@
-# Nova's Claude Code Enhancement Stack
-
-> **SOC Analyst · AskCMMC.ai · Aurora/NEXUS · Zorin OS Linux**
-> Full setup guide for everything installed in this session.
-
+# Claude Code Enhancement Stack
 ---
 
 ## What This Repo Contains
@@ -11,7 +7,6 @@
 |------|-------------|
 | `claude-code-repos.html` | Full ecosystem guide — all 6 repos, CLI connectors, setup instructions, DeepSeek swap |
 | `nova-tool-instructions.html` | Detailed usage instructions for every tool with exact commands and prompts |
-| `README.md` | This file |
 
 ---
 
@@ -103,12 +98,11 @@ DESIGN_REFERENCE: Linear
 ```
 
 Full CLAUDE.md includes:
-- Identity and role context (Nova, SOC Analyst, USCA, AskCMMC.ai)
+- Identity and role context 
 - Obsidian vault structure and paths
 - Session START rules (auto-load project CLAUDE.md and daily log)
 - Session END rules (update CLAUDE.md, append to daily log)
 - Directory → project mapping
-- Active projects (SmoothPlay Android, AskCMMC.ai, Job Search)
 - General rules (no git push, no system packages, token efficiency)
 - Design system path (added this session)
 
